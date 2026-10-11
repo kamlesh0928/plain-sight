@@ -3,531 +3,3116 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PlainSight</title>
-<meta name="description" content="Understand anything on your screen, in your language.">
+<title>PlainSight — Understand Before You Act | Digital Safety Explainer</title>
+<meta name="description" content="PlainSight helps people understand confusing digital messages and documents, identify observable warning signs, and find safer next steps across English, Hindi, and Marathi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ==========================================================================
+     Design System Tokens (Linear, Stripe & Apple inspired)
+     ========================================================================== */
   :root {
-    --ink: #15222E;
-    --muted: #51606E;
-    --ground: #EAF0F3;
-    --surface: #FFFFFF;
-    --line: #C9D5DC;
-    --action: #1D5D9B;
-    --safe: #1F7A4F;
-    --careful: #8A5A00;
-    --scam: #B3261E;
+    --bg-page: #F6F8FB;
+    --text-main: #101828;
+    --text-muted: #475467;
+    --text-subtle: #98A2B3;
+    
+    --primary: #2463EB;
+    --primary-hover: #1D4ED8;
+    --primary-active: #1E40AF;
+    --primary-light: #EFF6FF;
+    --primary-border: #BFDBFE;
+    --primary-ring: rgba(36, 99, 235, 0.25);
+    
+    --teal: #0F9F8F;
+    --teal-hover: #0D8275;
+    --teal-light: #E6F7F5;
+    --teal-border: #99E2D8;
+    
+    --card-bg: #FFFFFF;
+    --border-color: #EAECF0;
+    --border-subtle: #F2F4F7;
+    
+    /* Risk Levels (Strictly Qualified Assessments) */
+    --safe-text: #027A48;
+    --safe-bg: #ECFDF3;
+    --safe-border: #A6F4C5;
+    --safe-badge: #039855;
+    
+    --caution-text: #B54708;
+    --caution-bg: #FEF0C7;
+    --caution-border: #FEDF89;
+    --caution-badge: #D97706;
+    
+    --suspicion-text: #B42318;
+    --suspicion-bg: #FEE4E2;
+    --suspicion-border: #FECDCA;
+    --suspicion-badge: #D92D20;
+    
+    --neutral-text: #344054;
+    --neutral-bg: #F2F4F7;
+    --neutral-border: #D0D5DD;
+    --neutral-badge: #475467;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+    --shadow-card: 0 1px 3px 0 rgba(16, 24, 40, 0.06), 0 1px 2px 0 rgba(16, 24, 40, 0.04);
+    --shadow-hover: 0 10px 20px -3px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+    
+    --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     color-scheme: light;
   }
-  * { box-sizing: border-box; }
-  body {
+
+  *, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
-    background: var(--ground);
-    color: var(--ink);
-    font: 400 17px/1.55 "Noto Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }
-  .wrap {
-    max-width: 34rem;
-    margin: 0 auto;
-    padding: max(1rem, env(safe-area-inset-top)) 1rem max(2rem, env(safe-area-inset-bottom));
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', 'Noto Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
-  header {
+
+  /* Accessibility Utilities */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--primary-ring);
+    outline-offset: 2px;
+  }
+
+  /* ==========================================================================
+     Layout Container (Max width ~1180px with balanced 2-column desktop grid)
+     ========================================================================== */
+  .app-wrap {
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* Header */
+  header.site-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: .75rem;
-    padding: .5rem 0 1rem;
+    height: 72px;
+    gap: 1rem;
   }
-  .brand { font-weight: 700; font-size: 1.3rem; letter-spacing: -.01em; }
-  .seg {
+
+  .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text-main);
+  }
+
+  .brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(36, 99, 235, 0.25);
+    flex-shrink: 0;
+  }
+
+  .brand-titles {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text-main);
+  }
+
+  .brand-tagline-pill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    list-style: none;
+  }
+
+  .nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.925rem;
+    font-weight: 500;
+    transition: color var(--transition);
+  }
+
+  .nav-link:hover {
+    color: var(--primary);
+  }
+
+  /* Segmented Language Selector */
+  .lang-picker {
     display: inline-flex;
-    background: var(--surface);
-    border: 1px solid var(--line);
+    background: var(--bg-page);
+    border: 1px solid var(--border-color);
     border-radius: 999px;
     padding: 3px;
+    gap: 2px;
   }
-  .seg button {
-    border: 0;
+
+  .lang-btn {
+    border: none;
     background: transparent;
-    font: inherit;
-    font-size: .95rem;
-    min-height: 40px;
-    padding: .3rem .8rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    min-height: 36px;
+    padding: 0 0.85rem;
     border-radius: 999px;
-    color: var(--muted);
+    color: var(--text-muted);
     cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
-  button:focus-visible, .btn:focus-visible { outline: 3px solid var(--action); outline-offset: 2px; }
 
-  h1 {
-    font-size: 1.7rem;
-    line-height: 1.25;
+  .lang-btn:hover {
+    color: var(--text-main);
+  }
+
+  .lang-btn[aria-pressed="true"] {
+    background: var(--card-bg);
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+  }
+
+  /* ==========================================================================
+     Main Content Grid (Two columns on desktop, stacked on mobile)
+     ========================================================================== */
+  main.main-content {
+    padding: 2.25rem 0 3.5rem;
+    flex: 1;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1.15fr);
+    gap: 2.25rem;
+    align-items: start;
+  }
+
+  /* Left Column */
+  .col-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Right Column (Sidebar) */
+  .col-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Hero Section */
+  .hero-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--teal-light);
+    color: var(--teal);
+    border: 1px solid var(--teal-border);
+    border-radius: 999px;
+    font-size: 0.825rem;
+    font-weight: 600;
+    width: fit-content;
+  }
+
+  .hero-headline {
+    font-size: 2.15rem;
+    font-weight: 800;
+    line-height: 1.22;
+    letter-spacing: -0.03em;
+    color: var(--text-main);
+  }
+
+  .hero-subtext {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    max-width: 620px;
+  }
+
+  /* Standard Card Containers */
+  .ui-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 1.75rem;
+    transition: var(--transition);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .card-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
     font-weight: 700;
-    letter-spacing: -.015em;
-    margin: .25rem 0 1.25rem;
+    color: var(--text-main);
   }
 
-  .picker {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 1rem;
-  }
-  .stage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 9rem;
-    border: 2px dashed var(--line);
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: var(--muted);
-  }
-  .stage img { max-width: 100%; max-height: 16rem; object-fit: contain; border-radius: 6px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 56px;
-    padding: .5rem .75rem;
-    border: 1.5px solid var(--ink);
-    border-radius: 10px;
-    background: var(--surface);
-    color: var(--ink);
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.3;
+  /* ==========================================================================
+     4. Image Upload Experience
+     ========================================================================== */
+  .dropzone {
+    border: 2px dashed #CBD5E1;
+    background: #F8FAFC;
+    border-radius: var(--radius-md);
+    padding: 2.25rem 1.5rem;
     text-align: center;
     cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    user-select: none;
   }
-  .go {
-    width: 100%;
-    margin-top: .75rem;
-    min-height: 60px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--action);
-    color: #fff;
+
+  .dropzone:hover {
+    border-color: var(--primary);
+    background: #F0F7FF;
+  }
+
+  .dropzone.drag-active {
+    border-color: var(--primary);
+    background: #EFF6FF;
+    transform: scale(1.008);
+    box-shadow: 0 8px 24px -4px rgba(36, 99, 235, 0.15);
+  }
+
+  .dropzone-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .dropzone:hover .dropzone-icon-circle,
+  .dropzone.drag-active .dropzone-icon-circle {
+    transform: translateY(-2px) scale(1.06);
+  }
+
+  .dropzone-prompt {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+  }
+
+  .browse-link {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .dropzone-limits-text {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+  }
+
+  /* Quick Actions Row (Camera & Gallery) */
+  .quick-capture-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .btn-secondary {
+    min-height: 48px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    border-radius: var(--radius-sm);
     font-family: inherit;
+    font-size: 0.925rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+  }
+
+  .btn-secondary svg {
+    color: var(--text-muted);
+    transition: color var(--transition);
+  }
+
+  .btn-secondary:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+  }
+
+  .btn-secondary:hover svg {
+    color: var(--primary);
+  }
+
+  /* Selected Image Preview Box */
+  .selected-preview-card {
+    display: none;
+    background: #F8FAFC;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  .selected-preview-card.has-file {
+    display: flex;
+  }
+
+  .preview-thumb-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #CBD5E1;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #EAECF0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-thumb-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .preview-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .preview-filename {
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview-specs {
+    font-size: 0.775rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spec-badge {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #E2E8F0;
+    color: var(--text-main);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-icon-action {
+    background: transparent;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--text-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .btn-icon-action:hover {
+    background: #FEE4E2;
+    color: var(--suspicion-text);
+  }
+
+  /* Progress Bar */
+  .progress-box {
+    margin-top: 1.25rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .progress-box.active {
+    display: flex;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3B82F6 0%, var(--primary) 100%);
+    border-radius: 999px;
+    transition: width 0.2s ease-out;
+  }
+
+  /* Primary Action Button */
+  .btn-primary-action {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 1.25rem;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(36, 99, 235, 0.25);
+    transition: var(--transition);
+  }
+
+  .btn-primary-action:hover:not(:disabled) {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 18px rgba(36, 99, 235, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary-action:active:not(:disabled) {
+    background: var(--primary-active);
+    transform: translateY(0);
+  }
+
+  .btn-primary-action:disabled {
+    background: #CBD5E1;
+    color: #94A3B8;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spinner-icon {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .btn-primary-action.loading .spinner-icon {
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .privacy-inline-guarantee {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Toast Alerts */
+  .toast-wrapper {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    max-width: 400px;
+    width: calc(100% - 3rem);
+    pointer-events: none;
+  }
+
+  .toast-card {
+    pointer-events: auto;
+    background: #FFFFFF;
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 28px -6px rgba(16, 24, 40, 0.16);
+    border-left: 4px solid var(--text-subtle);
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .toast-card.hide {
+    animation: toastSlideOut 0.25s ease forwards;
+  }
+
+  .toast-card.success { border-left-color: var(--safe-badge); }
+  .toast-card.error { border-left-color: var(--suspicion-badge); }
+  .toast-card.warning { border-left-color: var(--caution-badge); }
+
+  .toast-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .toast-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .toast-msg {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    word-break: break-word;
+  }
+
+  .toast-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-subtle);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.1rem;
+  }
+
+  @keyframes toastSlideIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes toastSlideOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-16px) scale(0.96); }
+  }
+
+  /* Inline Error Box */
+  .inline-error-banner {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--suspicion-bg);
+    border: 1px solid var(--suspicion-border);
+    border-radius: var(--radius-sm);
+    color: var(--suspicion-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .inline-error-banner.show {
+    display: flex;
+  }
+
+  /* ==========================================================================
+     5. Quick Demo Scenarios ("Try a sample")
+     ========================================================================== */
+  .samples-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .section-intro-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .section-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .section-subheading {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .samples-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .sample-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+  }
+
+  .sample-card:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .sample-badge-tag {
+    font-size: 0.725rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    width: fit-content;
+  }
+
+  .tag-danger { background: var(--suspicion-bg); color: var(--suspicion-text); }
+  .tag-safe { background: var(--safe-bg); color: var(--safe-text); }
+  .tag-caution { background: var(--caution-bg); color: var(--caution-text); }
+
+  .sample-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.35;
+  }
+
+  .sample-desc {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .sample-preview-box {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.75rem;
+    font-size: 0.775rem;
+    color: #334155;
+    font-family: monospace;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    max-height: 80px;
+    overflow: hidden;
+  }
+
+  .btn-sample-trigger {
+    width: 100%;
+    min-height: 40px;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: var(--transition);
+  }
+
+  .btn-sample-trigger:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+  }
+
+  /* ==========================================================================
+     7. Analysis & Results Interface (The Core Safety Result)
+     ========================================================================== */
+  .results-container {
+    display: none;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeIn 0.35s ease-out;
+  }
+
+  .results-container.visible {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mode Banner (Discloses Live AI vs Synthetic Sample Mode) */
+  .mode-indicator-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: #FFFFFF;
+  }
+
+  .mode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.775rem;
+    font-weight: 700;
+  }
+
+  .mode-live {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--primary-border);
+  }
+
+  .mode-sample {
+    background: #FFFBEB;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+  }
+
+  /* Assessment Banner Card */
+  .assessment-card {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition);
+  }
+
+  .assessment-card[data-risk="likely_scam"] {
+    background: var(--suspicion-bg);
+    border-color: var(--suspicion-border);
+  }
+
+  .assessment-card[data-risk="careful"] {
+    background: var(--caution-bg);
+    border-color: var(--caution-border);
+  }
+
+  .assessment-card[data-risk="safe"] {
+    background: var(--safe-bg);
+    border-color: var(--safe-border);
+  }
+
+  .assessment-card[data-risk="unable_to_assess"] {
+    background: var(--neutral-bg);
+    border-color: var(--neutral-border);
+  }
+
+  .assessment-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .risk-badge-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .risk-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .assessment-card[data-risk="likely_scam"] .risk-icon-wrap { color: var(--suspicion-badge); }
+  .assessment-card[data-risk="careful"] .risk-icon-wrap { color: var(--caution-badge); }
+  .assessment-card[data-risk="safe"] .risk-icon-wrap { color: var(--safe-badge); }
+  .assessment-card[data-risk="unable_to_assess"] .risk-icon-wrap { color: var(--neutral-badge); }
+
+  .risk-titles {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .doc-type-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  .risk-title-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+  }
+
+  .assessment-headline-quote {
+    margin-top: 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-main);
+  }
+
+  .assessment-qualification-note {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Listen Audio Bar */
+  .audio-action-row {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .btn-listen {
+    min-height: 44px;
+    padding: 0.45rem 1.15rem;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.925rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+  }
+
+  .btn-listen:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 4px 10px rgba(36, 99, 235, 0.15);
+  }
+
+  .btn-listen[aria-pressed="true"] {
+    background: var(--text-main);
+    color: #FFFFFF;
+    border-color: var(--text-main);
+  }
+
+  .btn-reset-analysis {
+    min-height: 44px;
+    padding: 0.45rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-reset-analysis:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+  }
+
+  /* Result Detail Panels */
+  .result-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .detail-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .panel-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .panel-icon-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .panel-title {
     font-size: 1.1rem;
     font-weight: 700;
-    line-height: 1.3;
-    cursor: pointer;
+    color: var(--text-main);
   }
-  .go:disabled { background: #9DB3C6; cursor: not-allowed; }
-  .privacy { margin: .75rem 0 0; font-size: .9rem; color: var(--muted); text-align: center; }
 
-  .status { margin: 1rem 0 0; min-height: 1.5rem; color: var(--muted); }
-  .status.error { color: var(--scam); font-weight: 500; }
-  .spinner {
-    display: inline-block;
-    width: 1em; height: 1em;
-    margin-right: .5em;
-    vertical-align: -.15em;
-    border: 2px solid var(--line);
-    border-top-color: var(--action);
+  .observed-text-body {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.6;
+    background: #F8FAFC;
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    border-left: 3px solid var(--primary);
+  }
+
+  /* Red Flag Evidence Cards */
+  .evidence-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    list-style: none;
+  }
+
+  .evidence-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #FFF9F9;
+    border: 1px solid #FEE4E2;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+  }
+
+  .evidence-item svg {
+    color: var(--suspicion-badge);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .evidence-text {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.45;
+  }
+
+  /* Steps List */
+  .steps-numbered-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    counter-reset: step-counter;
+  }
+
+  .step-item {
+    counter-increment: step-counter;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: #F8FAFC;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+  }
+
+  .step-badge-num {
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    animation: spin .8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--line); } }
-
-  .verdict {
-    margin-top: 1.25rem;
-    padding: 1.1rem 1.1rem 1.15rem;
-    border-radius: 16px 16px 4px 4px;
-    color: #fff;
-    background: var(--careful);
-  }
-  .verdict[data-risk="safe"] { background: var(--safe); }
-  .verdict[data-risk="careful"] { background: var(--careful); }
-  .verdict[data-risk="likely_scam"] { background: var(--scam); }
-  .verdict .label {
+    background: var(--text-main);
+    color: #FFFFFF;
+    font-size: 0.825rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: .6rem;
-    font-size: 1.85rem;
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -.01em;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  .verdict svg { flex: none; width: 2rem; height: 2rem; }
-  .verdict .headline { margin: .5rem 0 0; font-size: 1.05rem; }
-  .listen {
-    margin-top: .9rem;
-    min-height: 48px;
-    padding: .4rem 1.1rem;
-    border: 1.5px solid #fff;
-    border-radius: 999px;
-    background: transparent;
-    color: #fff;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.2;
-    cursor: pointer;
-  }
-  .listen[aria-pressed="true"] { background: #fff; color: var(--ink); }
-  .listen:focus-visible { outline-color: #fff; }
 
-  .detail {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-top: 0;
-    border-radius: 4px 4px 12px 12px;
-    padding: 1.1rem;
+  .step-text {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.45;
+    flex: 1;
   }
-  .doctype { margin: 0 0 .25rem; color: var(--muted); font-size: .95rem; }
-  .detail p { margin: 0 0 1rem; }
-  .detail h2 { font-size: 1.1rem; margin: 1.25rem 0 .5rem; }
-  .detail ul, .detail ol { margin: 0; padding: 0; list-style: none; }
-  .detail li { position: relative; padding: .45rem 0 .45rem 1.1rem; }
-  .detail ul li::before {
-    content: "";
-    position: absolute;
-    left: 0; top: .5rem; bottom: .5rem;
-    width: 4px;
-    border-radius: 2px;
-    background: var(--scam);
+
+  /* Independent Verification Section */
+  .verification-block {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
   }
-  .detail ol { counter-reset: step; }
-  .detail ol li { padding-left: 2.1rem; counter-increment: step; }
-  .detail ol li::before {
-    content: counter(step);
-    position: absolute;
-    left: 0; top: .45rem;
-    width: 1.5rem; height: 1.5rem;
-    border-radius: 50%;
-    background: var(--ink);
-    color: #fff;
-    font-size: .85rem;
+
+  .verification-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .verification-disclaimer-box {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.825rem;
+    color: #92400E;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .official-links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+
+  .official-link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    background: #F8FAFC;
+    transition: var(--transition);
+  }
+
+  .official-link-card:hover {
+    background: #EFF6FF;
+    border-color: var(--primary-border);
+  }
+
+  .link-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
     font-weight: 700;
-    line-height: 1.5rem;
+    color: var(--text-main);
+  }
+
+  .link-url-tag {
+    font-size: 0.775rem;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .link-purpose {
+    font-size: 0.775rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  /* ==========================================================================
+     Sidebar Components (How it Works, Privacy, National Hotlines)
+     ========================================================================== */
+  .how-it-works-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .steps-visual-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    position: relative;
+  }
+
+  .step-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .node-indicator {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .node-text-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .node-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .node-desc {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+
+  /* Privacy Notice Card */
+  .privacy-card {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+  }
+
+  .privacy-card .card-icon-badge {
+    background: #DCFCE7;
+    color: var(--safe-badge);
+  }
+
+  .privacy-card .card-title {
+    color: #14532D;
+  }
+
+  .privacy-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    list-style: none;
+    font-size: 0.85rem;
+    color: #166534;
+    line-height: 1.45;
+  }
+
+  .privacy-bullets li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .privacy-bullets svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+    color: var(--safe-badge);
+  }
+
+  /* Hotline Card */
+  .hotline-card {
+    border-left: 4px solid var(--primary);
+  }
+
+  .hotline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .hotline-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .hotline-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .hotline-number {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* ==========================================================================
+     Footer
+     ========================================================================== */
+  footer.site-footer {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 2.25rem 0;
+    margin-top: auto;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    gap: 0.85rem;
   }
-  .notice {
-    margin: 1rem 0 0;
-    padding: .75rem .9rem;
-    border-left: 4px solid var(--careful);
-    background: #FFF6DD;
-    border-radius: 4px;
-    font-size: .95rem;
+
+  .footer-disclaimer {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    max-width: 650px;
+    line-height: 1.5;
   }
-  footer { margin-top: 1.75rem; font-size: .9rem; color: var(--muted); text-align: center; }
-  [hidden] { display: none !important; }
+
+  .footer-copyright {
+    font-size: 0.8rem;
+    color: var(--text-subtle);
+  }
+
+  /* ==========================================================================
+     Responsive Adjustments (Mobile, Tablet, Desktop)
+     ========================================================================== */
+  @media (max-width: 960px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .samples-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .official-links-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-headline {
+      font-size: 1.85rem;
+    }
+
+    .nav-links {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .app-wrap {
+      padding: 0 1rem;
+    }
+
+    .header-inner {
+      height: 64px;
+    }
+
+    .brand-name {
+      font-size: 1.15rem;
+    }
+
+    .hero-headline {
+      font-size: 1.55rem;
+    }
+
+    .hero-subtext {
+      font-size: 0.95rem;
+    }
+
+    .ui-card {
+      padding: 1.25rem;
+    }
+
+    .dropzone {
+      padding: 1.75rem 1rem;
+    }
+
+    .quick-capture-row {
+      grid-template-columns: 1fr;
+    }
+
+    .assessment-header {
+      flex-direction: column;
+    }
+
+    .audio-action-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .btn-listen {
+      justify-content: center;
+    }
+
+    .toast-wrapper {
+      top: 1rem;
+      right: 1rem;
+      left: 1rem;
+      width: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <span class="brand">PlainSight</span>
-    <div class="seg" role="group" aria-label="Language">
-      <button type="button" data-lang="en" aria-pressed="true">English</button>
-      <button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिन्दी</button>
-      <button type="button" data-lang="mr" aria-pressed="false" lang="mr">मराठी</button>
+
+  <!-- Screen Reader Announcements -->
+  <div id="aria-live-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Toast Notification Area -->
+  <div class="toast-wrapper" id="toast-wrapper" role="region" aria-label="Notifications"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="app-wrap header-inner">
+      <a href="#" class="brand-area" aria-label="PlainSight Home">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <circle cx="12" cy="11" r="3"/>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <span class="brand-name">PlainSight</span>
+          <span class="brand-tagline-pill">Digital Safety</span>
+        </div>
+      </a>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#how-it-works" class="nav-link" data-i="navHowItWorks">How it works</a></li>
+          <li><a href="#verification-sources" class="nav-link" data-i="navGuidelines">Official Guidelines</a></li>
+          <li><a href="#privacy-info" class="nav-link" data-i="navPrivacy">Privacy & Data</a></li>
+        </ul>
+
+        <!-- Language Selector -->
+        <div class="lang-picker" role="group" aria-label="Select language">
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">English</button>
+          <button type="button" class="lang-btn" data-lang="hi" aria-pressed="false" lang="hi">हिन्दी</button>
+          <button type="button" class="lang-btn" data-lang="mr" aria-pressed="false" lang="mr">मराठी</button>
+        </div>
+      </nav>
     </div>
   </header>
 
-  <main>
-    <h1 data-i="tagline">Understand anything on your screen, in your language.</h1>
+  <!-- Main Application Body -->
+  <main class="main-content">
+    <div class="app-wrap main-grid">
 
-    <section class="picker" aria-label="Choose an image">
-      <div class="stage" id="stage">
-        <span id="empty" data-i="hint">Add a screenshot or photo of an SMS, bill, payment request or message.</span>
-        <img id="preview" alt="" hidden>
-      </div>
-      <div class="row">
-        <button type="button" class="btn" id="btnCam" data-i="camera">Take a photo</button>
-        <button type="button" class="btn" id="btnGal" data-i="gallery">Choose from gallery</button>
-      </div>
-      <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
-      <input type="file" id="inGal" accept="image/*" hidden>
-      <button type="button" class="go" id="go" disabled data-i="explain">Explain this</button>
-      <p class="privacy" data-i="privacy">Your image is not saved.</p>
-    </section>
+      <!-- LEFT / PRIMARY COLUMN -->
+      <div class="col-primary">
+        
+        <!-- Hero Block -->
+        <section class="hero-block" aria-labelledby="hero-title">
+          <div class="hero-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span data-i="tagline">Understand before you act.</span>
+          </div>
+          <h1 id="hero-title" class="hero-headline" data-i="heroHeadline">Understand the message. Know your next step.</h1>
+          <p class="hero-subtext" data-i="heroSubtext">Get clear explanations, identify potential warning signs, and learn how to verify unfamiliar digital messages.</p>
+        </section>
 
-    <p class="status" id="status" role="status" aria-live="polite"></p>
+        <!-- Image Upload Component -->
+        <section class="ui-card upload-card" aria-labelledby="upload-card-title">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon-badge" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <h2 id="upload-card-title" class="card-title" data-i="uploadTitle">Examine a message or document</h2>
+            </div>
+          </div>
 
-    <section id="result" hidden aria-live="polite">
-      <div class="verdict" id="verdict" data-risk="careful">
-        <div class="label"><span id="icon" aria-hidden="true"></span><span id="riskLabel"></span></div>
-        <p class="headline" id="headline"></p>
-        <button type="button" class="listen" id="listen" aria-pressed="false" data-i="listen">Listen</button>
+          <!-- Hidden Native File Inputs -->
+          <input 
+            type="file" 
+            id="file-input" 
+            class="sr-only" 
+            accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" 
+            aria-describedby="upload-limits"
+          >
+          <input 
+            type="file" 
+            id="inCam" 
+            class="sr-only" 
+            accept="image/*" 
+            capture="environment"
+          >
+          <input 
+            type="file" 
+            id="inGal" 
+            class="sr-only" 
+            accept="image/*"
+          >
+
+          <!-- Interactive Drag & Drop Area -->
+          <div 
+            id="dropzone" 
+            class="dropzone" 
+            tabindex="0" 
+            role="button" 
+            aria-label="Upload area. Drop screenshot or press Enter to browse."
+          >
+            <div class="dropzone-icon-circle" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                <path d="M12 11v6"></path>
+                <path d="m9 14 3-3 3 3"></path>
+              </svg>
+            </div>
+            <p class="dropzone-prompt">
+              <span data-i="dropzoneHint">Drag and drop your screenshot or photo here, or</span> <span class="browse-link" id="browse-btn" data-i="browse">browse files</span>
+            </p>
+            <p class="dropzone-limits-text" id="upload-limits" data-i="limits">Supports PNG, JPG, JPEG, WebP • Up to 10 MB</p>
+          </div>
+
+          <!-- Quick Mobile Capture Row -->
+          <div class="quick-capture-row">
+            <button type="button" class="btn-secondary" id="btnCam">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span data-i="camera">Take a photo</span>
+            </button>
+            <button type="button" class="btn-secondary" id="btnGal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                <circle cx="9" cy="9" r="2"></circle>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+              </svg>
+              <span data-i="gallery">Choose from gallery</span>
+            </button>
+          </div>
+
+          <!-- Selected Image Preview Card -->
+          <div class="selected-preview-card" id="preview-card" role="region" aria-label="Selected file preview">
+            <div class="preview-thumb-wrap">
+              <img id="preview-img" alt="Thumbnail preview of selected screenshot">
+            </div>
+            <div class="preview-meta">
+              <span class="preview-filename" id="preview-name">screenshot.png</span>
+              <div class="preview-specs">
+                <span class="spec-badge" id="preview-ext">PNG</span>
+                <span id="preview-size">0 KB</span>
+              </div>
+            </div>
+            <div class="preview-controls">
+              <button type="button" class="btn-icon-action" id="btn-replace" title="Replace file" aria-label="Replace file">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 2v6h-6"></path>
+                  <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                  <path d="M3 22v-6h6"></path>
+                  <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                </svg>
+              </button>
+              <button type="button" class="btn-icon-action" id="btn-remove" title="Remove file" aria-label="Remove file">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Analysis Progress Bar -->
+          <div class="progress-box" id="progress-box" aria-hidden="true">
+            <div class="progress-labels">
+              <span id="progress-status-text" data-i="readingProgress">Reading image...</span>
+              <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+
+          <!-- Inline Error Alert -->
+          <div class="inline-error-banner" id="inline-error" role="alert">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="error-message-text"></span>
+          </div>
+
+          <!-- Main Explain Action Button -->
+          <button type="button" class="btn-primary-action" id="btn-explain" disabled>
+            <span class="spinner-icon" aria-hidden="true"></span>
+            <span id="btn-explain-label" data-i="explainBtn">Explain this message</span>
+          </button>
+
+          <div class="privacy-inline-guarantee">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span data-i="privacyNote">In-memory processing only. Your images are never saved to disk.</span>
+          </div>
+        </section>
+
+        <!-- Analysis & Results Section -->
+        <section class="results-container" id="results-section" aria-live="polite">
+          
+          <!-- Mode disclosure banner (distinguishes live model from synthetic sample mode) -->
+          <div class="mode-indicator-bar" id="mode-bar">
+            <span id="mode-badge" class="mode-pill mode-live">Live AI Analysis</span>
+            <span id="mode-subnote" class="text-subtle" style="font-size: 0.8rem;">Gemini Multimodal Reasoning</span>
+          </div>
+
+          <!-- Qualified Assessment Card -->
+          <div class="assessment-card" id="assessment-card" data-risk="careful">
+            <div class="assessment-header">
+              <div class="risk-badge-box">
+                <div class="risk-icon-wrap" id="risk-icon" aria-hidden="true"></div>
+                <div class="risk-titles">
+                  <span class="doc-type-tag" id="res-doctype">SMS Message</span>
+                  <h3 class="risk-title-heading" id="res-risk-title">Use caution</h3>
+                </div>
+              </div>
+            </div>
+
+            <p class="assessment-headline-quote" id="res-headline"></p>
+            <p class="assessment-qualification-note" data-i="qualificationDisclaimer">Automated assistive evaluation based on observable visual patterns. Not a certified legal or financial guarantee.</p>
+
+            <!-- Audio & Reset Controls -->
+            <div class="audio-action-row">
+              <button type="button" class="btn-listen" id="btn-listen" aria-pressed="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+                <span id="listen-label" data-i="listenBtn">Listen to explanation</span>
+              </button>
+
+              <button type="button" class="btn-reset-analysis" id="btn-reset">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                  <path d="M21 3v5h-5"></path>
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                  <path d="M3 21v-5h5"></path>
+                </svg>
+                <span data-i="resetBtn">Examine another message</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Structured Details (Observed, Red Flags, What To Do) -->
+          <div class="result-details-grid">
+            
+            <!-- What We Observed -->
+            <div class="detail-panel">
+              <div class="panel-header-row">
+                <div class="panel-icon-circle" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </div>
+                <h4 class="panel-title" data-i="observedTitle">What we observed</h4>
+              </div>
+              <div class="observed-text-body" id="res-summary"></div>
+            </div>
+
+            <!-- Why It May Be Concerning (Red Flags) -->
+            <div class="detail-panel" id="flags-panel">
+              <div class="panel-header-row">
+                <div class="panel-icon-circle" style="background: #FEE4E2; color: var(--suspicion-badge);" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l10 18H2L12 3z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <h4 class="panel-title" data-i="concernsTitle">Why it may be concerning</h4>
+              </div>
+              <ul class="evidence-cards-list" id="res-flags"></ul>
+            </div>
+
+            <!-- What To Do Next (Practical Steps) -->
+            <div class="detail-panel" id="steps-panel">
+              <div class="panel-header-row">
+                <div class="panel-icon-circle" style="background: #E6F7F5; color: var(--teal);" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                  </svg>
+                </div>
+                <h4 class="panel-title" data-i="stepsTitle">What to do next</h4>
+              </div>
+              <ol class="steps-numbered-list" id="res-steps"></ol>
+            </div>
+
+            <!-- Independent Verification Section -->
+            <div class="verification-block" id="verification-sources">
+              <div class="panel-header-row verification-header">
+                <div class="panel-icon-circle" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                </div>
+                <h4 class="panel-title" data-i="verificationTitle">Independent Official Verification</h4>
+              </div>
+
+              <div class="verification-disclaimer-box" data-i="verificationDisclaimer">
+                Official guidance provides secure, authorized contact methods and does not independently establish the authenticity of the original message.
+              </div>
+
+              <div class="official-links-grid">
+                <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer" class="official-link-card">
+                  <div class="link-title-row">
+                    <span>National Cyber Crime Portal</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </div>
+                  <span class="link-url-tag">cybercrime.gov.in • Toll-Free 1930</span>
+                  <span class="link-purpose">Report online financial fraud, UPI traps & identity theft.</span>
+                </a>
+
+                <a href="https://sancharsaathi.gov.in" target="_blank" rel="noopener noreferrer" class="official-link-card">
+                  <div class="link-title-row">
+                    <span>Sanchar Saathi (Chakshu)</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </div>
+                  <span class="link-url-tag">sancharsaathi.gov.in</span>
+                  <span class="link-purpose">Report suspected fraud SMS, WhatsApp & fake lottery callers.</span>
+                </a>
+
+                <a href="https://rbikehtahai.rbi.org.in" target="_blank" rel="noopener noreferrer" class="official-link-card">
+                  <div class="link-title-row">
+                    <span>RBI Kehta Hai</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </div>
+                  <span class="link-url-tag">rbikehtahai.rbi.org.in</span>
+                  <span class="link-purpose">Official banking guidelines on safe transactions and bank communication rules.</span>
+                </a>
+
+                <a href="https://www.npci.org.in" target="_blank" rel="noopener noreferrer" class="official-link-card">
+                  <div class="link-title-row">
+                    <span>NPCI UPI Safety Shield</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </div>
+                  <span class="link-url-tag">npci.org.in</span>
+                  <span class="link-purpose">Entering a UPI PIN only deducts money; PIN is never needed to receive money.</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Quick Demo Scenarios ("Try a sample") -->
+        <section class="samples-section" aria-labelledby="samples-heading">
+          <div class="section-intro-row">
+            <div>
+              <h3 id="samples-heading" class="section-heading" data-i="sampleHeading">Try a sample</h3>
+              <p class="section-subheading" data-i="sampleSubheading">Explore how PlainSight deciphers common digital messages and suspicious requests.</p>
+            </div>
+          </div>
+
+          <div class="samples-grid">
+            <!-- Scenario 1: Suspicious KYC Message -->
+            <article class="sample-card">
+              <span class="sample-badge-tag tag-danger">Suspicious Request</span>
+              <h4 class="sample-title" data-i="sampleKycTitle">Suspicious KYC message</h4>
+              <p class="sample-desc" data-i="sampleKycDesc">Threatens immediate bank account suspension with an unverified third-party link.</p>
+              <div class="sample-preview-box">URGENT: SBI YONO will block your A/C today. Update PAN now: sbi-kyc-update.xyz</div>
+              <button type="button" class="btn-sample-trigger" data-sample="kyc">
+                <span data-i="trySampleAction">Test this sample</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </article>
+
+            <!-- Scenario 2: Ordinary Payment Confirmation -->
+            <article class="sample-card">
+              <span class="sample-badge-tag tag-safe">Legitimate Receipt</span>
+              <h4 class="sample-title" data-i="samplePaymentTitle">Ordinary payment confirmation</h4>
+              <p class="sample-desc" data-i="samplePaymentDesc">Standard digital transaction confirmation receipt with official bank reference numbers.</p>
+              <div class="sample-preview-box">Paid ₹450 to Grocery Store. Ref: 428472910482. State Bank of India. Success.</div>
+              <button type="button" class="btn-sample-trigger" data-sample="payment">
+                <span data-i="trySampleAction">Test this sample</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </article>
+
+            <!-- Scenario 3: Ambiguous Loan Advertisement -->
+            <article class="sample-card">
+              <span class="sample-badge-tag tag-caution">Ambiguous Promotion</span>
+              <h4 class="sample-title" data-i="sampleLoanTitle">Ambiguous loan advertisement</h4>
+              <p class="sample-desc" data-i="sampleLoanDesc">Unsolicited promotion offering zero-interest loans without verification, prompting link clicks.</p>
+              <div class="sample-preview-box">Pre-approved Instant Loan ₹5,00,000 at 0% interest. No CIBIL check: bit.ly/easy-loan</div>
+              <button type="button" class="btn-sample-trigger" data-sample="loan">
+                <span data-i="trySampleAction">Test this sample</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </article>
+          </div>
+        </section>
+
       </div>
-      <div class="detail">
-        <p class="doctype" id="docType"></p>
-        <p id="summary"></p>
-        <div id="flagsBox">
-          <h2 data-i="flags">What looks wrong</h2>
-          <ul id="flags"></ul>
-        </div>
-        <div id="stepsBox">
-          <h2 data-i="steps">What to do</h2>
-          <ol id="steps"></ol>
-        </div>
-        <p class="notice" id="lowConf" hidden></p>
-        <p class="notice" id="demoNote" hidden></p>
-      </div>
-    </section>
+
+      <!-- RIGHT / SIDEBAR COLUMN -->
+      <aside class="col-sidebar" aria-label="Support and guidance">
+        
+        <!-- How PlainSight Works -->
+        <section class="ui-card how-it-works-card" id="how-it-works" aria-labelledby="hiw-title">
+          <div class="card-header" style="margin-bottom: 0.5rem;">
+            <div class="card-title-group">
+              <div class="card-icon-badge" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <h3 id="hiw-title" class="card-title" data-i="howItWorksTitle">How PlainSight Works</h3>
+            </div>
+          </div>
+
+          <div class="steps-visual-timeline">
+            <!-- Step 1 -->
+            <div class="step-node">
+              <div class="node-indicator">1</div>
+              <div class="node-text-col">
+                <strong class="node-title" data-i="step1Title">1. Understand</strong>
+                <p class="node-desc" data-i="step1Desc">Identifies the apparent document or communication type (SMS, bill, UPI request) in everyday words.</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-node">
+              <div class="node-indicator">2</div>
+              <div class="node-text-col">
+                <strong class="node-title" data-i="step2Title">2. Examine</strong>
+                <p class="node-desc" data-i="step2Desc">Pinpoints observable warning signs such as artificial panic, lookalike sender IDs, and unverified links.</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-node">
+              <div class="node-indicator">3</div>
+              <div class="node-text-col">
+                <strong class="node-title" data-i="step3Title">3. Verify</strong>
+                <p class="node-desc" data-i="step3Desc">Guides you with safe, practical next steps and reviewed official verification hotlines.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Privacy & Security Guarantee -->
+        <section class="ui-card privacy-card" id="privacy-info" aria-labelledby="privacy-title">
+          <div class="card-header" style="margin-bottom: 0.75rem;">
+            <div class="card-title-group">
+              <div class="card-icon-badge" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <h3 id="privacy-title" class="card-title" data-i="privacyTitle">Privacy & Data Guarantee</h3>
+            </div>
+          </div>
+
+          <ul class="privacy-bullets">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span data-i="privacyPoint1">Images are processed in transient server memory and relayed to Google Gemini for visual reasoning.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span data-i="privacyPoint2">No images or documents are ever written to a database or stored on disk.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span data-i="privacyPoint3">Sensitive credentials (OTPs, UPI PINs, passwords) are never requested, recorded, or echoed.</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Emergency Hotlines Box -->
+        <section class="ui-card hotline-card" aria-labelledby="hotline-title">
+          <div class="card-header" style="margin-bottom: 0.5rem;">
+            <div class="card-title-group">
+              <div class="card-icon-badge" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </div>
+              <h3 id="hotline-title" class="card-title">National Emergency Hotlines</h3>
+            </div>
+          </div>
+
+          <div>
+            <div class="hotline-row">
+              <span class="hotline-name">National Cyber Crime</span>
+              <span class="hotline-number">1930</span>
+            </div>
+            <div class="hotline-row">
+              <span class="hotline-name">Emergency Services</span>
+              <span class="hotline-number">112</span>
+            </div>
+            <div class="hotline-row">
+              <span class="hotline-name">Chakshu Portal</span>
+              <span class="hotline-number" style="font-size: 0.8rem;">sancharsaathi.gov.in</span>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+
+    </div>
   </main>
 
-  <footer data-i="disclaimer">PlainSight is a helper, not a bank. Never share your OTP or PIN.</footer>
-</div>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="app-wrap footer-inner">
+      <p class="footer-disclaimer" data-i="disclaimerText">
+        PlainSight is an assistive digital literacy tool, not a financial institution or law enforcement agency. Never share OTPs or UPI PINs with anyone.
+      </p>
+      <p class="footer-copyright">PlainSight v2 • Built for accessible digital safety</p>
+    </div>
+  </footer>
 
-<script>
-"use strict";
+  <!-- ==========================================================================
+       Vanilla JavaScript (All logic contained in index.html)
+       ========================================================================== -->
+  <script>
+    "use strict";
 
-const I18N = {
-  en: {
-    tagline: "Understand anything on your screen, in your language.",
-    hint: "Add a screenshot or photo of an SMS, bill, payment request or message.",
-    camera: "Take a photo",
-    gallery: "Choose from gallery",
-    explain: "Explain this",
-    privacy: "Your image is not saved.",
-    listen: "Listen",
-    stop: "Stop",
-    flags: "What looks wrong",
-    steps: "What to do",
-    reading: "Reading your image…",
-    error: "Something went wrong. Please try again.",
-    noImage: "Add a photo first.",
-    lowConf: "I am not fully sure. Ask someone you trust before you act.",
-    demoNote: "This is a sample result because the model was not available.",
-    noVoice: "No voice for this language is installed on this device.",
-    disclaimer: "PlainSight is a helper, not a bank. Never share your OTP or PIN.",
-    safe: "Looks safe",
-    careful: "Be careful",
-    likely_scam: "Likely a scam"
-  },
-  hi: {
-    tagline: "आपकी स्क्रीन पर जो भी हो, अपनी भाषा में समझें।",
-    hint: "SMS, बिल, पेमेंट रिक्वेस्ट या मैसेज का स्क्रीनशॉट या फोटो जोड़ें।",
-    camera: "फोटो लें",
-    gallery: "गैलरी से चुनें",
-    explain: "यह समझाएँ",
-    privacy: "आपकी इमेज सेव नहीं होती।",
-    listen: "सुनें",
-    stop: "रोकें",
-    flags: "क्या गड़बड़ लग रहा है",
-    steps: "क्या करें",
-    reading: "आपकी इमेज पढ़ी जा रही है…",
-    error: "कुछ गड़बड़ हो गई। फिर से कोशिश करें।",
-    noImage: "पहले एक फोटो जोड़ें।",
-    lowConf: "मुझे पूरा यक़ीन नहीं है। कुछ करने से पहले किसी भरोसेमंद व्यक्ति से पूछें।",
-    demoNote: "मॉडल उपलब्ध नहीं था, इसलिए यह एक नमूना परिणाम है।",
-    noVoice: "इस डिवाइस पर इस भाषा की आवाज़ उपलब्ध नहीं है।",
-    disclaimer: "PlainSight सहायक है, बैंक नहीं। OTP या PIN कभी साझा न करें।",
-    safe: "सुरक्षित लगता है",
-    careful: "सावधान रहें",
-    likely_scam: "धोखाधड़ी की आशंका"
-  },
-  mr: {
-    tagline: "तुमच्या स्क्रीनवरील काहीही, तुमच्या भाषेत समजून घ्या.",
-    hint: "SMS, बिल, पेमेंट रिक्वेस्ट किंवा मेसेजचा स्क्रीनशॉट किंवा फोटो जोडा.",
-    camera: "फोटो काढा",
-    gallery: "गॅलरीतून निवडा",
-    explain: "हे समजावा",
-    privacy: "तुमची इमेज साठवली जात नाही.",
-    listen: "ऐका",
-    stop: "थांबवा",
-    flags: "काय चुकीचे वाटते",
-    steps: "काय करावे",
-    reading: "तुमची इमेज वाचत आहे…",
-    error: "काहीतरी चुकले. पुन्हा प्रयत्न करा.",
-    noImage: "आधी एक फोटो जोडा.",
-    lowConf: "मला पूर्ण खात्री नाही. काही करण्याआधी विश्वासू व्यक्तीला विचारा.",
-    demoNote: "मॉडेल उपलब्ध नव्हते, म्हणून हा एक नमुना निकाल आहे.",
-    noVoice: "या डिव्हाइसवर या भाषेचा आवाज उपलब्ध नाही.",
-    disclaimer: "PlainSight हा सहाय्यक आहे, बँक नाही. OTP किंवा PIN कधीही शेअर करू नका.",
-    safe: "सुरक्षित वाटते",
-    careful: "सावध रहा",
-    likely_scam: "फसवणुकीची शक्यता"
-  }
-};
+    // Configuration & Backend limits
+    const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB (Matches backend MAX_BYTES)
+    const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'];
+    const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
-const VOICE_LANG = { en: "en-IN", hi: "hi-IN", mr: "mr-IN" };
+    // Multilingual Localization Strings (English, Hindi, Marathi)
+    const I18N = {
+      en: {
+        tagline: "Understand before you act.",
+        heroHeadline: "Understand the message. Know your next step.",
+        heroSubtext: "Get clear explanations, identify potential warning signs, and learn how to verify unfamiliar digital messages.",
+        navHowItWorks: "How it works",
+        navGuidelines: "Official Guidelines",
+        navPrivacy: "Privacy & Data",
+        uploadTitle: "Examine a message or document",
+        dropzoneHint: "Drag and drop your screenshot or photo here, or",
+        browse: "browse files",
+        limits: "Supports PNG, JPG, JPEG, WebP • Up to 10 MB",
+        camera: "Take a photo",
+        gallery: "Choose from gallery",
+        explainBtn: "Explain this message",
+        explainingBtn: "Analyzing message with AI…",
+        privacyNote: "In-memory processing only. Your images are never saved to disk.",
+        sampleHeading: "Try a sample",
+        sampleSubheading: "Explore how PlainSight deciphers common digital messages and suspicious requests.",
+        sampleKycTitle: "Suspicious KYC message",
+        sampleKycDesc: "Threatens immediate bank account suspension with an unverified third-party link.",
+        samplePaymentTitle: "Ordinary payment confirmation",
+        samplePaymentDesc: "Standard digital transaction confirmation receipt with official bank reference numbers.",
+        sampleLoanTitle: "Ambiguous loan advertisement",
+        sampleLoanDesc: "Unsolicited promotion offering zero-interest loans without verification, prompting link clicks.",
+        trySampleAction: "Test this sample",
+        howItWorksTitle: "How PlainSight Works",
+        step1Title: "1. Understand",
+        step1Desc: "Identifies the apparent document or communication type (SMS, bill, UPI request) in everyday words.",
+        step2Title: "2. Examine",
+        step2Desc: "Pinpoints observable warning signs such as artificial panic, lookalike sender IDs, and unverified links.",
+        step3Title: "3. Verify",
+        step3Desc: "Guides you with safe, practical next steps and reviewed official verification hotlines.",
+        privacyTitle: "Privacy & Data Guarantee",
+        privacyPoint1: "Images are processed in transient server memory and relayed to Google Gemini for visual reasoning.",
+        privacyPoint2: "No images or documents are ever written to a database or stored on disk.",
+        privacyPoint3: "Sensitive credentials (OTPs, UPI PINs, passwords) are never requested, recorded, or echoed.",
+        observedTitle: "What we observed",
+        concernsTitle: "Why it may be concerning",
+        stepsTitle: "What to do next",
+        verificationTitle: "Independent Official Verification",
+        verificationDisclaimer: "Official guidance provides secure, authorized contact methods and does not independently establish the authenticity of the original message.",
+        qualificationDisclaimer: "Automated assistive evaluation based on observable visual patterns. Not a certified legal or financial guarantee.",
+        listenBtn: "Listen to explanation",
+        stopListenBtn: "Stop listening",
+        resetBtn: "Examine another message",
+        disclaimerText: "PlainSight is an assistive digital literacy tool, not a financial institution or law enforcement agency. Never share OTPs or UPI PINs with anyone.",
+        readingProgress: "Reading image...",
+        analyzingProgress: "Analyzing screen with AI…",
+        finalizingProgress: "Synthesizing plain explanation…",
+        completeProgress: "Analysis complete!",
+        errNoImage: "Please select or drop an image first.",
+        errTooLarge: "Image exceeds the 10 MB limit.",
+        errBadFormat: "Unsupported format. Use PNG, JPG, JPEG, or WebP.",
+        errApiFailed: "The analysis request could not be completed. Please try again.",
+        errSpeechUnsupported: "Text-to-speech is not supported on this browser.",
+        safeTitle: "No obvious warning signs found",
+        cautionTitle: "Use caution",
+        scamTitle: "High suspicion",
+        unableTitle: "Unable to assess"
+      },
+      hi: {
+        tagline: "कदम उठाने से पहले समझें।",
+        heroHeadline: "संदेश को समझें। अगला सही कदम जानें।",
+        heroSubtext: "स्पष्ट व्याख्या प्राप्त करें, संभावित चेतावनी संकेतों को पहचानें और अपरिचित डिजिटल संदेशों की पुष्टि करना सीखें।",
+        navHowItWorks: "यह कैसे काम करता है",
+        navGuidelines: "आधिकारिक दिशानिर्देश",
+        navPrivacy: "गोपनीयता और डेटा",
+        uploadTitle: "संदेश या दस्तावेज़ की जाँच करें",
+        dropzoneHint: "स्क्रीनशॉट या फोटो यहाँ खींचकर लाएँ, या",
+        browse: "फ़ाइल चुनें",
+        limits: "समर्थित फ़ॉर्मेट: PNG, JPG, JPEG, WebP • अधिकतम 10 MB",
+        camera: "फोटो लें",
+        gallery: "गैलरी से चुनें",
+        explainBtn: "इस संदेश को समझाएँ",
+        explainingBtn: "AI द्वारा संदेश का विश्लेषण हो रहा है…",
+        privacyNote: "केवल मेमोरी में प्रोसेसिंग। आपकी तस्वीरें कभी भी डिस्क पर सहेजी नहीं जाती हैं।",
+        sampleHeading: "एक नमूना आज़माएँ",
+        sampleSubheading: "देखें कि PlainSight आम डिजिटल संदेशों और संदिग्ध अनुरोधों को कैसे समझता है।",
+        sampleKycTitle: "संदिग्ध KYC सूचना",
+        sampleKycDesc: "अपुष्ट लिंक के साथ तुरंत बैंक खाता बंद करने की धमकी।",
+        samplePaymentTitle: "सामान्य भुगतान रसीद",
+        samplePaymentDesc: "सफल भुगतान और बैंक संदर्भ संख्या दर्शाने वाली सामान्य डिजिटल रसीद।",
+        sampleLoanTitle: "अस्पष्ट ऋण विज्ञापन",
+        sampleLoanDesc: "बिना सत्यापन शून्य-ब्याज ऋण का दावा करने वाला अनचाहा विज्ञापन।",
+        trySampleAction: "यह नमूना आज़माएँ",
+        howItWorksTitle: "PlainSight कैसे काम करता है",
+        step1Title: "1. समझें",
+        step1Desc: "संदेश या दस्तावेज़ के प्रकार (SMS, बिल, UPI अनुरोध) को सरल शब्दों में पहचानता है।",
+        step2Title: "2. जाँचें",
+        step2Desc: "कृत्रिम जल्दबाजी, संदिग्ध लिंक और फर्जी प्रेषक आईडी जैसे संकेतों को रेखांकित करता है।",
+        step3Title: "3. सत्यापित करें",
+        step3Desc: "सुरक्षित अगले कदमों और आधिकारिक सरकारी हेल्पलाइन की जानकारी देता है।",
+        privacyTitle: "गोपनीयता और डेटा सुरक्षा",
+        privacyPoint1: "तस्वीरों को केवल अस्थायी सर्वर मेमोरी में प्रोसेस किया जाता है।",
+        privacyPoint2: "किसी भी तस्वीर या दस्तावेज़ को डिस्क पर संग्रहीत नहीं किया जाता है।",
+        privacyPoint3: "OTP या UPI PIN जैसे संवेदनशील विवरण कभी एकत्र नहीं किए जाते।",
+        observedTitle: "हमने क्या देखा",
+        concernsTitle: "यह चिंताजनक क्यों हो सकता है",
+        stepsTitle: "आगे क्या करें",
+        verificationTitle: "स्वतंत्र आधिकारिक सत्यापन",
+        verificationDisclaimer: "आधिकारिक दिशानिर्देश सुरक्षित संपर्क विधियाँ प्रदान करते हैं और मूल संदेश की प्रामाणिकता की पुष्टि नहीं करते।",
+        qualificationDisclaimer: "दृश्य पैटर्न पर आधारित स्वचालित मूल्यांकन। कोई प्रमाणित कानूनी या वित्तीय गारंटी नहीं।",
+        listenBtn: "व्याख्या सुनें",
+        stopListenBtn: "सुनना बंद करें",
+        resetBtn: "अन्य संदेश की जाँच करें",
+        disclaimerText: "PlainSight एक डिजिटल सुरक्षा सहायक है, बैंक नहीं। अपना OTP या UPI PIN कभी किसी के साथ साझा न करें।",
+        readingProgress: "इमेज पढ़ी जा रही है...",
+        analyzingProgress: "AI द्वारा स्क्रीन का विश्लेषण…",
+        finalizingProgress: "सरल व्याख्या तैयार की जा रही है…",
+        completeProgress: "विश्लेषण पूरा हुआ!",
+        errNoImage: "कृपया पहले एक फोटो या स्क्रीनशॉट जोड़ें।",
+        errTooLarge: "इमेज 10 MB सीमा से बड़ी है।",
+        errBadFormat: "असमर्थित प्रारूप। कृपया PNG, JPG, JPEG या WebP चुनें।",
+        errApiFailed: "विश्लेषण अनुरोध पूरा नहीं हो सका। कृपया पुनः प्रयास करें।",
+        errSpeechUnsupported: "इस ब्राउज़र पर टेक्स्ट-टू-स्पीच उपलब्ध नहीं है।",
+        safeTitle: "कोई स्पष्ट चेतावनी संकेत नहीं मिले",
+        cautionTitle: "सावधानी बरतें",
+        scamTitle: "अत्यधिक संदिग्ध",
+        unableTitle: "मूल्यांकन करने में असमर्थ"
+      },
+      mr: {
+        tagline: "कृती करण्यापूर्वी समजून घ्या.",
+        heroHeadline: "संदेश समजून घ्या. पुढचे योग्य पाऊल ओळखा.",
+        heroSubtext: "स्पष्ट स्पष्टीकरण मिळवा, संभाव्य चेतावणीचे संकेत ओळखा आणि अपरिचित डिजिटल संदेशांची पडताळणी कशी करावी ते शिका.",
+        navHowItWorks: "हे कसे कार्य करते",
+        navGuidelines: "अधिकृत मार्गदर्शक",
+        navPrivacy: "गोपनीयता आणि डेटा",
+        uploadTitle: "संदेश किंवा दस्तऐवज तपासा",
+        dropzoneHint: "स्क्रीनशॉट किंवा फोटो येथे ड्रॅग करा, किंवा",
+        browse: "ब्राउझ करा",
+        limits: "समर्थित फॉरमॅट: PNG, JPG, JPEG, WebP • कमाल 10 MB",
+        camera: "फोटो काढा",
+        gallery: "गॅलरीतून निवडा",
+        explainBtn: "हा संदेश समजावून सांगा",
+        explainingBtn: "AI द्वारे संदेशाचे विश्लेषण सुरू आहे…",
+        privacyNote: "केवळ तात्पुरती मेमरी प्रक्रिया. तुमच्या प्रतिमा कधीही डिस्कवर साठवल्या जात नाहीत.",
+        sampleHeading: "एक नमुना तपासा",
+        sampleSubheading: "PlainSight सामान्य डिजिटल संदेश आणि संशयास्पद विनंत्यांचे विश्लेषण कसे करते ते पहा.",
+        sampleKycTitle: "संशयास्पद KYC सूचना",
+        sampleKycDesc: "अनोळखी लिंकसह बँक खाते लगेच बंद करण्याची धमकी देणारा मेसेज.",
+        samplePaymentTitle: "सामान्य पेमेंट पावती",
+        samplePaymentDesc: "यशस्वी व्यवहार आणि बँक संदर्भ क्रमांक दर्शवणारी नियमित डिजिटल पावती.",
+        sampleLoanTitle: "अस्पष्ट कर्ज जाहिरात",
+        sampleLoanDesc: "विना पडताळणी शून्य-व्याज कर्जाचा दावा करणारी अनोळखी जाहिरात.",
+        trySampleAction: "हा नमुना तपासा",
+        howItWorksTitle: "PlainSight कसे कार्य करते",
+        step1Title: "1. समजून घ्या",
+        step1Desc: "संदेश किंवा दस्तऐवजाचा प्रकार (SMS, बिल, UPI विनंती) सोप्या शब्दांत ओळखतो.",
+        step2Title: "2. तपासा",
+        step2Desc: "घाईगडबड, संशयास्पद लिंक्स आणि बनावट प्रेषक आयडी यांसारखे धोके स्पष्ट करतो.",
+        step3Title: "3. पडताळा",
+        step3Desc: "सुरक्षित कृती आणि अधिकृत सरकारी हेल्पलाइनसह योग्य मार्गदर्शन करतो.",
+        privacyTitle: "गोपनीयता आणि डेटा हमी",
+        privacyPoint1: "प्रतिमा तात्पुरत्या सर्व्हर मेमरीमध्ये प्रक्रिया केल्या जातात.",
+        privacyPoint2: "कोणत्याही प्रतिमा किंवा दस्तऐवज डिस्कवर साठवले जात नाहीत.",
+        privacyPoint3: "OTP किंवा UPI PIN यांसारखे संवेदनशील तपशील कधीही साठवले जात नाहीत.",
+        observedTitle: "आम्ही काय पाहिले",
+        concernsTitle: "हे चिंताजनक का असू शकते",
+        stepsTitle: "पुढे काय करावे",
+        verificationTitle: "स्वतंत्र अधिकृत पडताळणी",
+        verificationDisclaimer: "अधिकृत मार्गदर्शक सुरक्षित संपर्क पद्धती देतात आणि मूळ संदेशाच्या सत्यतेची स्वतंत्र खात्री देत नाहीत.",
+        qualificationDisclaimer: "दृश्य नमुन्यांवर आधारित स्वयंचलित मूल्यांकन. कोणतीही प्रमाणित कायदेशीर किंवा आर्थिक हमी नाही.",
+        listenBtn: "स्पष्टीकरण ऐका",
+        stopListenBtn: "ऐकणे थांबवा",
+        resetBtn: "दुसरा संदेश तपासा",
+        disclaimerText: "PlainSight हे डिजिटल सुरक्षा सहाय्यक आहे, बँक नाही. आपला OTP किंवा UPI PIN कधीही कोणाशीही शेअर करू नका.",
+        readingProgress: "इमेज वाचत आहे...",
+        analyzingProgress: "AI द्वारे स्क्रीनचे विश्लेषण…",
+        finalizingProgress: "सोपे स्पष्टीकरण तयार करत आहे…",
+        completeProgress: "विश्लेषण पूर्ण झाले!",
+        errNoImage: "कृपया आधी एक फोटो किंवा स्क्रीनशॉट जोडा.",
+        errTooLarge: "इमेज 10 MB मर्यादेपेक्षा मोठी आहे.",
+        errBadFormat: "असमर्थित फॉरमॅट. कृपया PNG, JPG, JPEG किंवा WebP निवडा.",
+        errApiFailed: "विश्लेषण विनंती पूर्ण होऊ शकली नाही. कृपया पुन्हा प्रयत्न करा.",
+        errSpeechUnsupported: "या ब्राउझरवर मजकूर-ते-आवाज उपलब्ध नाही.",
+        safeTitle: "कोणतेही उघड चेतावणी संकेत आढळले नाहीत",
+        cautionTitle: "सावधगिरी बाळगा",
+        scamTitle: "अतिशय संशयास्पद",
+        unableTitle: "मूल्यांकन करण्यात असमर्थ"
+      }
+    };
 
-const ICONS = {
-  safe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>',
-  careful: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>',
-  likely_scam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>'
-};
+    // Text to Speech Voice Config
+    const VOICE_LANG = { en: "en-IN", hi: "hi-IN", mr: "mr-IN" };
 
-const state = { lang: "en", file: null, url: null, busy: false, hasResult: false, speech: "" };
-const $ = (id) => document.getElementById(id);
-const t = (key) => I18N[state.lang][key];
+    // SVGs for Risk Badges
+    const RISK_ICONS = {
+      safe: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+      careful: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      likely_scam: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9.5" y1="9.5" x2="14.5" y2="14.5"/><line x1="14.5" y1="9.5" x2="9.5" y2="14.5"/></svg>',
+      unable_to_assess: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    };
 
-function applyLang() {
-  document.documentElement.lang = state.lang;
-  document.querySelectorAll("[data-i]").forEach((el) => { el.textContent = t(el.dataset.i); });
-  document.querySelectorAll(".seg button").forEach((b) => {
-    b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang));
-  });
-  setListenLabel(false);
-}
+    // Synthetic Sample Data Definitions (Explicitly Disclosed as Sample Mode)
+    const SAMPLE_FIXTURES = {
+      kyc: {
+        name: "sample_kyc_threat.png",
+        size: 34820,
+        type: "image/png",
+        previewText: "URGENT: SBI YONO account will be blocked today due to pending KYC. Update PAN immediately to avoid suspension: http://sbi-kyc-update.xyz/login. Call Manager: 9876543210",
+        result: {
+          en: {
+            doc_type: "SMS Message",
+            headline: "Do not open this link or call the number. This is an urgent phishing threat.",
+            summary: "This message falsely threatens immediate suspension of your bank account unless you enter details on an unverified website. Legitimate banks do not block accounts via SMS links.",
+            risk_level: "likely_scam",
+            red_flags: [
+              "Urgency panic: Threatens account block within hours to force hasty action.",
+              "Lookalike phishing domain: Uses 'sbi-kyc-update.xyz' instead of official banking domain (.sbi or bank.sbi).",
+              "Requests personal mobile callback: Directs to a 10-digit mobile number rather than bank's official toll-free."
+            ],
+            what_to_do: [
+              "Do not click the link and do not enter your PAN, login password, or OTP.",
+              "Verify your account status directly via your official bank app or card customer care number.",
+              "Report this sender ID immediately on the Chakshu portal (sancharsaathi.gov.in) or dial 1930."
+            ],
+            confidence: "high"
+          },
+          hi: {
+            doc_type: "एसएमएस संदेश",
+            headline: "इस लिंक पर क्लिक न करें और न ही कॉल करें। यह एक गंभीर धोखाधड़ी का प्रयास है।",
+            summary: "इस संदेश में दावा किया गया है कि तुरंत KYC न करने पर बैंक खाता बंद हो जाएगा। असली बैंक कभी भी SMS लिंक के ज़रिए खाता बंद करने की धमकी नहीं देते।",
+            risk_level: "likely_scam",
+            red_flags: [
+              "घबराहट पैदा करना: जल्दबाजी में कदम उठाने के लिए कुछ ही घंटों में खाता बंद करने की धमकी।",
+              "फर्जी लिंक: आधिकारिक बैंक वेबसाइट के बजाय अनाधिकृत डोमेन (.xyz) का उपयोग।",
+              "निजी मोबाइल नंबर: आधिकारिक टोल-फ्री के बजाय सामान्य 10 अंकों का नंबर दिया गया है।"
+            ],
+            what_to_do: [
+              "लिंक पर क्लिक न करें और अपना पैन नंबर, पासवर्ड या OTP कभी न भरें।",
+              "अपने बैंक कार्ड के पीछे दिए गए आधिकारिक नंबर से बैंक से संपर्क करें।",
+              "इसकी रिपोर्ट चक्षु पोर्टल (sancharsaathi.gov.in) या 1930 पर करें।"
+            ],
+            confidence: "high"
+          },
+          mr: {
+            doc_type: "एसएमएस संदेश",
+            headline: "या लिंकवर क्लिक करू नका आणि कॉल करू नका. हा फसवणुकीचा प्रकार आहे.",
+            summary: "या संदेशात भीती दाखवली आहे की तात्काळ KYC केले नाही तर बँक खाते बंद होईल. खरे बँक अशा प्रकारे SMS लिंकद्वारे खाते बंद करत नाहीत.",
+            risk_level: "likely_scam",
+            red_flags: [
+              "घाईगडबड निर्माण करणे: काही तासांत खाते बंद करण्याची धमकी देणे.",
+              "संशयास्पद लिंक: अधिकृत बँक डोमेनऐवजी अनोळखी लिंक (.xyz) वापरणे.",
+              "वैयक्तिक मोबाइल नंबर: बँकेच्या अधिकृत नंबरऐवजी वैयक्तिक नंबरवर कॉल करण्यास सांगणे."
+            ],
+            what_to_do: [
+              "लिंकवर क्लिक करू नका आणि आपला PAN, पासवर्ड किंवा OTP कोठेही भरू नका.",
+              "आपल्या डेबिट कार्डमागील अधिकृत कस्टमर केअर नंबरवर संपर्क साधा.",
+              "याची तक्रार चक्षु पोर्टल (sancharsaathi.gov.in) किंवा 1930 वर करा."
+            ],
+            confidence: "high"
+          }
+        }
+      },
+      payment: {
+        name: "sample_payment_receipt.png",
+        size: 28410,
+        type: "image/png",
+        previewText: "Paid ₹450 to Grocery Store on 10 Oct, 02:15 PM. UPI Ref: 428472910482. State Bank of India. Transaction Successful.",
+        result: {
+          en: {
+            doc_type: "Payment Confirmation Receipt",
+            headline: "No obvious warning signs detected on this transaction receipt.",
+            summary: "This visual is an ordinary outgoing digital payment confirmation for ₹450. It shows completed transaction details with a standard 12-digit UPI reference number.",
+            risk_level: "safe",
+            red_flags: [],
+            what_to_do: [
+              "Keep the 12-digit UPI reference number (UTR) if you need to reconcile your grocery bill.",
+              "Remember: You never need to enter your UPI PIN to receive money in the future."
+            ],
+            confidence: "high"
+          },
+          hi: {
+            doc_type: "भुगतान रसीद",
+            headline: "इस लेनदेन रसीद में कोई स्पष्ट चेतावनी संकेत नहीं मिले।",
+            summary: "यह ₹450 के सफल डिजिटल भुगतान की सामान्य रसीद है। इसमें 12 अंकों की मानक UPI संदर्भ संख्या दिखाई दे रही है।",
+            risk_level: "safe",
+            red_flags: [],
+            what_to_do: [
+              "आवश्यकता पड़ने पर 12 अंकों का UPI संदर्भ (UTR) नंबर संभालकर रखें।",
+              "याद रखें: पैसे प्राप्त करने के लिए कभी भी UPI PIN दर्ज करने की आवश्यकता नहीं होती।"
+            ],
+            confidence: "high"
+          },
+          mr: {
+            doc_type: "पेमेंट पावती",
+            headline: "या व्यवहाराच्या पावतीमध्ये कोणताही स्पष्ट धोका आढळला नाही.",
+            summary: "ही ₹450 च्या यशस्वी डिजिटल पेमेंटची सामान्य पावती आहे. यामध्ये 12 अंकी अधिकृत UPI संदर्भ क्रमांक दिसत आहे.",
+            risk_level: "safe",
+            red_flags: [],
+            what_to_do: [
+              "गरज असल्यास 12 अंकी UPI संदर्भ क्रमांक (UTR) जपून ठेवा.",
+              "लक्षात ठेवा: पैसे मिळवण्यासाठी कधीही UPI PIN टाकण्याची गरज नसते."
+            ],
+            confidence: "high"
+          }
+        }
+      },
+      loan: {
+        name: "sample_ambiguous_loan.png",
+        size: 31200,
+        type: "image/png",
+        previewText: "Instant Loan ₹5,00,000 approved! 0% interest for 1 year, no credit check. Click to claim your funds now: bit.ly/easy-loan-now",
+        result: {
+          en: {
+            doc_type: "Unsolicited Promotion",
+            headline: "Use caution. Unrealistic financial promises with shortened link.",
+            summary: "This promotion promises ₹5,00,000 instant loan with zero interest and no credit score verification. Unregulated loan traps often charge hidden upfront 'processing fees' or harvest phone contacts.",
+            risk_level: "careful",
+            red_flags: [
+              "Unrealistic promise: 0% interest without credit verification is a major hallmark of predatory lending.",
+              "Shortened redirect link (bit.ly): Conceals the actual destination server.",
+              "Unsolicited offer: Sent without prior loan application or customer relationship."
+            ],
+            what_to_do: [
+              "Do not install APKs or download apps from shortened SMS links.",
+              "Verify any lender against the RBI Registered NBFC list (rbi.org.in).",
+              "Never pay advance 'processing fees' to release a promised loan."
+            ],
+            confidence: "medium"
+          },
+          hi: {
+            doc_type: "अनचाहा विज्ञापन",
+            headline: "सावधानी बरतें। बिना पड़ताल शून्य-ब्याज का अवास्तविक दावा।",
+            summary: "यह संदेश बिना किसी क्रेडिट स्कोर जाँच के 0% ब्याज पर ₹5,00,000 का ऋण देने का दावा करता है। ऐसे फर्जी लोन अक्सर 'प्रोसेसिंग फीस' के नाम पर ठगी करते हैं।",
+            risk_level: "careful",
+            red_flags: [
+              "अवास्तविक वादा: बिना क्रेडिट स्कोर के शून्य ब्याज पर लोन देना असंभव वादा है।",
+              "संक्षिप्त लिंक (bit.ly): असली वेबसाइट का पता छिपाता है।",
+              "अनचाहा ऑफर: बिना किसी आवेदन के भेजा गया प्रस्ताव।"
+            ],
+            what_to_do: [
+              "SMS में दी गई लिंक से कोई भी अनजान ऐप (APK) इंस्टॉल न करें।",
+              "ऋण देने वाली संस्था की RBI की अधिकृत NBFC सूची से पुष्टि करें।",
+              "लोन स्वीकृत कराने के नाम पर कभी कोई अग्रिम शुल्क न दें।"
+            ],
+            confidence: "medium"
+          },
+          mr: {
+            doc_type: "अनपेक्षित जाहिरात",
+            headline: "सावधगिरी बाळगा. अवास्तविक आर्थिक आश्वासने आणि संशयास्पद लिंक.",
+            summary: "हा संदेश कोणत्याही तपासणीशिवाय शून्य टक्के व्याजावर ₹5 लाखांचे कर्ज देण्याचा दावा करतो. अशा फसव्या योजना अनेकदा आधी 'प्रोसेसिंग फी' मागतात.",
+            risk_level: "careful",
+            red_flags: [
+              "अवास्तविक दावा: कोणतीही कागदपत्रे किंवा सिबिल तपासणीशिवाय 0% कर्ज देणे संशयास्पद आहे.",
+              "शॉर्ट लिंक (bit.ly): मूळ वेबसाइट पत्ता लपवते.",
+              "अनोळखी ऑफर: कोणतीही पूर्व चौकशी नसताना आलेला मेसेज."
+            ],
+            what_to_do: [
+              "SMS मधील लिंकवरून कोणतेही अनोळखी अॅप इंस्टॉल करू नका.",
+              "RBI च्या अधिकृत NBFC यादीतून संस्थेची खात्री करा.",
+              "कर्ज मिळवण्यासाठी कधीही आधी पैसे किंवा शुल्क भरू नका."
+            ],
+            confidence: "medium"
+          }
+        }
+      }
+    };
 
-function setStatus(message, { error = false, spinner = false } = {}) {
-  const el = $("status");
-  el.className = "status" + (error ? " error" : "");
-  el.textContent = "";
-  if (spinner) {
-    const s = document.createElement("span");
-    s.className = "spinner";
-    s.setAttribute("aria-hidden", "true");
-    el.appendChild(s);
-  }
-  el.appendChild(document.createTextNode(message || ""));
-}
+    // Application State Object
+    const state = {
+      lang: "en",
+      file: null,
+      objectUrl: null,
+      isUploading: false,
+      isSampleMode: false,
+      activeSampleKey: null,
+      lastAnalyzedData: null,
+      speechUtterance: null
+    };
 
-function setFile(file) {
-  if (!file) return;
-  state.file = file;
-  if (state.url) URL.revokeObjectURL(state.url);
-  state.url = URL.createObjectURL(file);
-  $("preview").src = state.url;
-  $("preview").hidden = false;
-  $("empty").hidden = true;
-  $("go").disabled = false;
-  $("result").hidden = true;
-  state.hasResult = false;
-  stopSpeaking();
-  setStatus("");
-}
+    // DOM Elements Cache
+    const $ = (id) => document.getElementById(id);
+    const t = (key) => (I18N[state.lang] && I18N[state.lang][key]) || (I18N.en[key] || key);
 
-function fillList(id, items) {
-  const list = $(id);
-  list.textContent = "";
-  items.forEach((text) => {
-    const li = document.createElement("li");
-    li.textContent = text;
-    list.appendChild(li);
-  });
-}
+    const fileInput = $("file-input");
+    const inCam = $("inCam");
+    const inGal = $("inGal");
+    const dropzone = $("dropzone");
+    const browseBtn = $("browse-btn");
+    const btnCam = $("btnCam");
+    const btnGal = $("btnGal");
+    const previewCard = $("preview-card");
+    const previewImg = $("preview-img");
+    const previewName = $("preview-name");
+    const previewExt = $("preview-ext");
+    const previewSize = $("preview-size");
+    const btnReplace = $("btn-replace");
+    const btnRemove = $("btn-remove");
+    const btnExplain = $("btn-explain");
+    const btnExplainLabel = $("btn-explain-label");
+    const progressBox = $("progress-box");
+    const progressFill = $("progress-fill");
+    const progressPercent = $("progress-percent");
+    const progressStatusText = $("progress-status-text");
+    const inlineError = $("inline-error");
+    const errorMessageText = $("error-message-text");
+    const toastWrapper = $("toast-wrapper");
+    const ariaLive = $("aria-live-status");
 
-function render(data) {
-  const risk = ["safe", "careful", "likely_scam"].includes(data.risk_level) ? data.risk_level : "careful";
-  $("verdict").dataset.risk = risk;
-  $("icon").innerHTML = ICONS[risk];
-  $("riskLabel").textContent = t(risk);
-  $("headline").textContent = data.headline || "";
-  $("headline").hidden = !data.headline;
-  $("docType").textContent = data.doc_type || "";
-  $("summary").textContent = data.summary || "";
+    // Results Elements Cache
+    const resultsSection = $("results-section");
+    const modeBar = $("mode-bar");
+    const modeBadge = $("mode-badge");
+    const modeSubnote = $("mode-subnote");
+    const assessmentCard = $("assessment-card");
+    const riskIcon = $("risk-icon");
+    const resDoctype = $("res-doctype");
+    const resRiskTitle = $("res-risk-title");
+    const resHeadline = $("res-headline");
+    const resSummary = $("res-summary");
+    const flagsPanel = $("flags-panel");
+    const resFlags = $("res-flags");
+    const stepsPanel = $("steps-panel");
+    const resSteps = $("res-steps");
+    const btnListen = $("btn-listen");
+    const listenLabel = $("listen-label");
+    const btnReset = $("btn-reset");
 
-  const flags = data.red_flags || [];
-  const steps = data.what_to_do || [];
-  fillList("flags", flags);
-  fillList("steps", steps);
-  $("flagsBox").hidden = flags.length === 0;
-  $("stepsBox").hidden = steps.length === 0;
+    /* ==========================================================================
+       Utility Functions & Accessibility Helpers
+       ========================================================================== */
+    function announceAria(text) {
+      if (ariaLive) {
+        ariaLive.textContent = '';
+        setTimeout(() => { ariaLive.textContent = text; }, 50);
+      }
+    }
 
-  $("lowConf").textContent = t("lowConf");
-  $("lowConf").hidden = data.confidence !== "low";
-  $("demoNote").textContent = t("demoNote");
-  $("demoNote").hidden = !data.demo;
+    function formatFileSize(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
 
-  state.speech = [t(risk), data.headline, data.summary, ...steps].filter(Boolean).join(". ");
-  state.hasResult = true;
-  $("result").hidden = false;
-  $("verdict").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-}
+    function validateFile(file) {
+      if (!file) return { valid: false, error: t('errNoImage') };
 
-async function analyze() {
-  if (!state.file) { setStatus(t("noImage"), { error: true }); return; }
-  if (state.busy) return;
-  state.busy = true;
-  $("go").disabled = true;
-  stopSpeaking();
-  setStatus(t("reading"), { spinner: true });
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        return { valid: false, error: `${t('errTooLarge')} (${formatFileSize(file.size)})` };
+      }
 
-  const body = new FormData();
-  body.append("image", state.file, state.file.name || "image.jpg");
-  body.append("lang", state.lang);
+      const fileNameLower = (file.name || '').toLowerCase();
+      const hasValidExt = ALLOWED_EXTENSIONS.some(ext => fileNameLower.endsWith(ext));
+      const hasValidMime = file.type ? (ALLOWED_MIME_TYPES.includes(file.type) || file.type.startsWith('image/')) : false;
 
-  try {
-    const res = await fetch("/analyze", { method: "POST", body });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    render(await res.json());
-    setStatus("");
-  } catch (err) {
-    $("result").hidden = true;
-    setStatus(t("error"), { error: true });
-  } finally {
-    state.busy = false;
-    $("go").disabled = false;
-  }
-}
+      if (!hasValidExt && !hasValidMime) {
+        return { valid: false, error: t('errBadFormat') };
+      }
 
-/* ---------- read aloud (Web Speech API) ---------- */
-function setListenLabel(speaking) {
-  const btn = $("listen");
-  btn.textContent = speaking ? t("stop") : t("listen");
-  btn.setAttribute("aria-pressed", String(speaking));
-}
+      return { valid: true };
+    }
 
-function stopSpeaking() {
-  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-  setListenLabel(false);
-}
+    function showToast(type, title, message) {
+      const card = document.createElement('div');
+      card.className = `toast-card ${type}`;
+      card.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
-function pickVoice(target) {
-  const voices = window.speechSynthesis.getVoices();
-  const norm = (v) => v.lang.replace("_", "-").toLowerCase();
-  const exact = voices.find((v) => norm(v) === target.toLowerCase());
-  const loose = voices.find((v) => norm(v).startsWith(target.slice(0, 2).toLowerCase()));
-  return { voice: exact || loose || null, haveVoices: voices.length > 0 };
-}
+      const titleEl = document.createElement('div');
+      titleEl.className = 'toast-title';
+      titleEl.textContent = title;
 
-function toggleSpeech() {
-  if (!("speechSynthesis" in window)) { setStatus(t("noVoice"), { error: true }); return; }
-  if (window.speechSynthesis.speaking) { stopSpeaking(); return; }
-  if (!state.speech) return;
+      const msgEl = document.createElement('div');
+      msgEl.className = 'toast-msg';
+      msgEl.textContent = message;
 
-  const utter = new SpeechSynthesisUtterance(state.speech);
-  utter.lang = VOICE_LANG[state.lang];
-  utter.rate = 0.9;
-  const { voice, haveVoices } = pickVoice(utter.lang);
-  if (voice) utter.voice = voice;
-  else if (haveVoices && state.lang !== "en") setStatus(t("noVoice"), { error: true });
-  utter.onend = utter.onerror = () => setListenLabel(false);
-  setListenLabel(true);
-  window.speechSynthesis.speak(utter);
-}
+      const contentBox = document.createElement('div');
+      contentBox.className = 'toast-content';
+      contentBox.appendChild(titleEl);
+      contentBox.appendChild(msgEl);
 
-/* ---------- wiring ---------- */
-document.querySelectorAll(".seg button").forEach((b) => {
-  b.addEventListener("click", () => {
-    if (b.dataset.lang === state.lang) return;
-    state.lang = b.dataset.lang;
-    try { localStorage.setItem("plainsight-lang", state.lang); } catch (e) { /* storage may be blocked */ }
-    stopSpeaking();
-    applyLang();
-    setStatus("");
-    if (state.file && state.hasResult) analyze();  // explain again in the new language
-  });
-});
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'toast-close-btn';
+      closeBtn.setAttribute('aria-label', 'Dismiss notification');
+      closeBtn.innerHTML = '&times;';
 
-$("btnCam").addEventListener("click", () => $("inCam").click());
-$("btnGal").addEventListener("click", () => $("inGal").click());
-$("inCam").addEventListener("change", (e) => setFile(e.target.files[0]));
-$("inGal").addEventListener("change", (e) => setFile(e.target.files[0]));
-$("go").addEventListener("click", analyze);
-$("listen").addEventListener("click", toggleSpeech);
+      const dismiss = () => {
+        card.classList.add('hide');
+        card.addEventListener('animationend', () => {
+          if (card.parentNode) card.parentNode.removeChild(card);
+        }, { once: true });
+      };
 
-try {
-  const saved = localStorage.getItem("plainsight-lang");
-  if (saved && I18N[saved]) state.lang = saved;
-} catch (e) { /* ignore */ }
-applyLang();
-</script>
+      closeBtn.addEventListener('click', dismiss);
+      const timer = setTimeout(dismiss, 5000);
+      card.addEventListener('mouseenter', () => clearTimeout(timer));
+
+      card.appendChild(contentBox);
+      card.appendChild(closeBtn);
+      toastWrapper.appendChild(card);
+      announceAria(`${title}: ${message}`);
+    }
+
+    function showInlineError(message) {
+      if (message) {
+        errorMessageText.textContent = message;
+        inlineError.classList.add('show');
+        announceAria(`Error: ${message}`);
+      } else {
+        errorMessageText.textContent = '';
+        inlineError.classList.remove('show');
+      }
+    }
+
+    /* ==========================================================================
+       Language Localization Handling
+       ========================================================================== */
+    function applyLanguage(newLang) {
+      if (!I18N[newLang]) return;
+      state.lang = newLang;
+      document.documentElement.lang = newLang;
+
+      // Update static text elements
+      document.querySelectorAll("[data-i]").forEach(el => {
+        const key = el.dataset.i;
+        if (key && I18N[state.lang][key]) {
+          el.textContent = I18N[state.lang][key];
+        }
+      });
+
+      // Update language toggle button aria states
+      document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.lang === state.lang));
+      });
+
+      // Update button state label
+      if (state.isUploading) {
+        btnExplainLabel.textContent = t("explainingBtn");
+      } else {
+        btnExplainLabel.textContent = t("explainBtn");
+      }
+
+      stopSpeech();
+
+      // If active result is displayed, re-render in the selected language
+      if (state.lastAnalyzedData) {
+        if (state.isSampleMode && state.activeSampleKey) {
+          const sample = SAMPLE_FIXTURES[state.activeSampleKey];
+          if (sample && sample.result[state.lang]) {
+            renderAnalysisResult(sample.result[state.lang], true);
+          }
+        } else if (state.file) {
+          // Re-analyze live image in the new language
+          triggerLiveAnalysis();
+        }
+      }
+    }
+
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetLang = btn.dataset.lang;
+        if (targetLang === state.lang) return;
+        try { localStorage.setItem("plainsight_lang_pref", targetLang); } catch (e) {}
+        applyLanguage(targetLang);
+      });
+    });
+
+    /* ==========================================================================
+       File Selection, Preview, and Cleanup
+       ========================================================================== */
+    function setFileSelection(file, isSample = false, sampleKey = null) {
+      showInlineError(null);
+
+      // Validate
+      const validation = validateFile(file);
+      if (!validation.valid) {
+        showInlineError(validation.error);
+        showToast('error', 'Invalid File', validation.error);
+        return false;
+      }
+
+      // Cleanup prior object URL
+      if (state.objectUrl) {
+        URL.revokeObjectURL(state.objectUrl);
+        state.objectUrl = null;
+      }
+
+      state.file = file;
+      state.isSampleMode = isSample;
+      state.activeSampleKey = sampleKey;
+      state.objectUrl = URL.createObjectURL(file);
+
+      // Populate preview card
+      previewImg.src = state.objectUrl;
+      previewName.textContent = file.name || "screenshot.png";
+      const ext = (file.name ? file.name.split('.').pop() : 'IMG').toUpperCase();
+      previewExt.textContent = ext;
+      previewSize.textContent = formatFileSize(file.size);
+
+      previewCard.classList.add('has-file');
+      btnExplain.disabled = false;
+
+      // Reset prior analysis results view until user triggers explain
+      resultsSection.classList.remove('visible');
+      state.lastAnalyzedData = null;
+      stopSpeech();
+
+      announceAria(`Selected image: ${file.name}`);
+      return true;
+    }
+
+    function clearFileSelection() {
+      if (state.isUploading) return;
+      if (state.objectUrl) {
+        URL.revokeObjectURL(state.objectUrl);
+        state.objectUrl = null;
+      }
+      state.file = null;
+      state.isSampleMode = false;
+      state.activeSampleKey = null;
+
+      fileInput.value = "";
+      inCam.value = "";
+      inGal.value = "";
+
+      previewCard.classList.remove('has-file');
+      btnExplain.disabled = true;
+      showInlineError(null);
+      resultsSection.classList.remove('visible');
+      state.lastAnalyzedData = null;
+      stopSpeech();
+
+      announceAria("Selected image removed.");
+    }
+
+    // Drag and Drop Zone Event Listeners
+    let dragCounter = 0;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      window.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+    });
+
+    dropzone.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      dragCounter++;
+      dropzone.classList.add('drag-active');
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (!dropzone.classList.contains('drag-active')) {
+        dropzone.classList.add('drag-active');
+      }
+    });
+
+    dropzone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        dropzone.classList.remove('drag-active');
+      }
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      dropzone.classList.remove('drag-active');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        setFileSelection(e.dataTransfer.files[0], false, null);
+      }
+    });
+
+    // Keyboard trigger on dropzone
+    dropzone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    browseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    btnCam.addEventListener('click', () => inCam.click());
+    btnGal.addEventListener('click', () => inGal.click());
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) setFileSelection(e.target.files[0], false, null);
+    });
+    inCam.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) setFileSelection(e.target.files[0], false, null);
+    });
+    inGal.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) setFileSelection(e.target.files[0], false, null);
+    });
+
+    btnRemove.addEventListener('click', clearFileSelection);
+    btnReplace.addEventListener('click', () => fileInput.click());
+
+    /* ==========================================================================
+     Synthetic Sample Generation (Creates real PNG Blobs on Canvas)
+     ========================================================================== */
+    function createSyntheticSampleBlob(textTitle, textBody, tagType) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 360;
+      const ctx = canvas.getContext('2d');
+
+      // Card Background
+      ctx.fillStyle = tagType === 'danger' ? '#FEF2F2' : (tagType === 'safe' ? '#F0FDF4' : '#FFFBEB');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Card Border
+      ctx.strokeStyle = tagType === 'danger' ? '#FCA5A5' : (tagType === 'safe' ? '#86EFAC' : '#FDE68A');
+      ctx.lineWidth = 4;
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+      // Header Bar
+      ctx.fillStyle = tagType === 'danger' ? '#991B1B' : (tagType === 'safe' ? '#166534' : '#92400E');
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText(textTitle, 30, 50);
+
+      // Text Box
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '18px monospace';
+      
+      // Word wrap inside canvas
+      const words = textBody.split(' ');
+      let line = '';
+      let y = 110;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > 560 && n > 0) {
+          ctx.fillText(line, 30, y);
+          line = words[n] + ' ';
+          y += 32;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, 30, y);
+
+      // Watermark
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillText('PlainSight Synthetic Test Sample • Not A Real User Case', 30, 320);
+
+      return new Promise(resolve => {
+        canvas.toBlob(blob => {
+          resolve(blob);
+        }, 'image/png');
+      });
+    }
+
+    // Wire up "Test this sample" buttons
+    document.querySelectorAll(".btn-sample-trigger").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const sampleKey = btn.dataset.sample;
+        const fixture = SAMPLE_FIXTURES[sampleKey];
+        if (!fixture) return;
+
+        const tag = sampleKey === 'kyc' ? 'danger' : (sampleKey === 'payment' ? 'safe' : 'caution');
+        const blob = await createSyntheticSampleBlob(fixture.result.en.doc_type, fixture.previewText, tag);
+        const sampleFile = new File([blob], fixture.name, { type: 'image/png' });
+
+        setFileSelection(sampleFile, true, sampleKey);
+
+        // Smooth scroll to upload card
+        $("upload-card-title").scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        showToast('info', 'Sample Scenario Loaded', `Loaded synthetic test case: "${fixture.name}". Click "Explain this message" to review.`);
+      });
+    });
+
+    /* ==========================================================================
+       Analysis Execution (Live Model vs Clearly Disclosed Sample Fixture)
+       ========================================================================== */
+    async function triggerLiveAnalysis() {
+      if (!state.file) {
+        showInlineError(t('errNoImage'));
+        return;
+      }
+      if (state.isUploading) return;
+
+      state.isUploading = true;
+      btnExplain.disabled = true;
+      btnExplain.classList.add('loading');
+      btnExplainLabel.textContent = t('explainingBtn');
+      showInlineError(null);
+      stopSpeech();
+
+      // Show Progress Bar
+      progressBox.classList.add('active');
+      progressBox.setAttribute('aria-hidden', 'false');
+      progressFill.style.width = '15%';
+      progressPercent.textContent = '15%';
+      progressStatusText.textContent = t('readingProgress');
+
+      let currentProgress = 15;
+      const progressTimer = setInterval(() => {
+        if (currentProgress < 85) {
+          currentProgress += Math.floor(Math.random() * 8) + 4;
+          if (currentProgress > 85) currentProgress = 85;
+          progressFill.style.width = `${currentProgress}%`;
+          progressPercent.textContent = `${currentProgress}%`;
+
+          if (currentProgress > 40 && currentProgress < 75) {
+            progressStatusText.textContent = t('analyzingProgress');
+          } else if (currentProgress >= 75) {
+            progressStatusText.textContent = t('finalizingProgress');
+          }
+        }
+      }, 220);
+
+      // If user is running a Sample Scenario without live changes:
+      if (state.isSampleMode && state.activeSampleKey) {
+        setTimeout(() => {
+          clearInterval(progressTimer);
+          progressFill.style.width = '100%';
+          progressPercent.textContent = '100%';
+          progressStatusText.textContent = t('completeProgress');
+
+          setTimeout(() => {
+            progressBox.classList.remove('active');
+            progressBox.setAttribute('aria-hidden', 'true');
+            state.isUploading = false;
+            btnExplain.disabled = false;
+            btnExplain.classList.remove('loading');
+            btnExplainLabel.textContent = t('explainBtn');
+
+            const fixture = SAMPLE_FIXTURES[state.activeSampleKey];
+            const resultData = (fixture && fixture.result[state.lang]) ? fixture.result[state.lang] : fixture.result.en;
+            renderAnalysisResult(resultData, true);
+          }, 350);
+        }, 800);
+        return;
+      }
+
+      // Live Backend API Analysis
+      const formData = new FormData();
+      formData.append("image", state.file, state.file.name || "screenshot.png");
+      formData.append("lang", state.lang);
+
+      try {
+        const response = await fetch("/analyze", {
+          method: "POST",
+          body: formData
+        });
+
+        clearInterval(progressTimer);
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        progressFill.style.width = '100%';
+        progressPercent.textContent = '100%';
+        progressStatusText.textContent = t('completeProgress');
+
+        setTimeout(() => {
+          progressBox.classList.remove('active');
+          progressBox.setAttribute('aria-hidden', 'true');
+          renderAnalysisResult(data, false);
+          showToast('success', 'Analysis Completed', data.headline || 'Review safety assessment below.');
+        }, 350);
+
+      } catch (err) {
+        clearInterval(progressTimer);
+        progressBox.classList.remove('active');
+        progressBox.setAttribute('aria-hidden', 'true');
+        resultsSection.classList.remove('visible');
+        showInlineError(`${t('errApiFailed')} (${err.message || 'Network error'})`);
+        showToast('error', 'Analysis Failed', t('errApiFailed'));
+      } finally {
+        state.isUploading = false;
+        btnExplain.disabled = false;
+        btnExplain.classList.remove('loading');
+        btnExplainLabel.textContent = t('explainBtn');
+      }
+    }
+
+    btnExplain.addEventListener('click', triggerLiveAnalysis);
+
+    /* ==========================================================================
+       Results Rendering (Safe DOM Methods — Prevent HTML Injection)
+       ========================================================================== */
+    function renderAnalysisResult(data, isSampleMode = false) {
+      state.lastAnalyzedData = data;
+
+      // Disclose Sample vs Live AI Mode
+      if (isSampleMode) {
+        modeBadge.className = "mode-pill mode-sample";
+        modeBadge.textContent = "Sample Scenario (Demo Mode)";
+        modeSubnote.textContent = "Live AI analysis was not invoked for this sample fixture.";
+      } else {
+        modeBadge.className = "mode-pill mode-live";
+        modeBadge.textContent = "Live AI Analysis";
+        modeSubnote.textContent = data.demo ? "Fallback sample fixture used by server." : "Google Gemini Multimodal Evaluation";
+      }
+
+      // Qualified Risk Level
+      const risk = ["safe", "careful", "likely_scam"].includes(data.risk_level) ? data.risk_level : "unable_to_assess";
+      assessmentCard.setAttribute("data-risk", risk);
+      riskIcon.innerHTML = RISK_ICONS[risk] || RISK_ICONS.careful;
+
+      // Qualified Title
+      let riskTitle = t('cautionTitle');
+      if (risk === 'safe') riskTitle = t('safeTitle');
+      else if (risk === 'likely_scam') riskTitle = t('scamTitle');
+      else if (risk === 'unable_to_assess') riskTitle = t('unableTitle');
+      resRiskTitle.textContent = riskTitle;
+
+      // Safe textContent assignments (Prevent XSS)
+      resDoctype.textContent = data.doc_type || "Digital Document";
+      resHeadline.textContent = data.headline || "";
+      resHeadline.style.display = data.headline ? "block" : "none";
+      resSummary.textContent = data.summary || "No description provided.";
+
+      // Red flags list
+      resFlags.innerHTML = "";
+      const flags = Array.isArray(data.red_flags) ? data.red_flags : [];
+      if (flags.length === 0) {
+        flagsPanel.style.display = "none";
+      } else {
+        flagsPanel.style.display = "block";
+        flags.forEach(flagText => {
+          const li = document.createElement("li");
+          li.className = "evidence-item";
+
+          const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          iconSvg.setAttribute("width", "18");
+          iconSvg.setAttribute("height", "18");
+          iconSvg.setAttribute("viewBox", "0 0 24 24");
+          iconSvg.setAttribute("fill", "none");
+          iconSvg.setAttribute("stroke", "currentColor");
+          iconSvg.setAttribute("stroke-width", "2.2");
+          iconSvg.innerHTML = '<path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>';
+
+          const textSpan = document.createElement("span");
+          textSpan.className = "evidence-text";
+          textSpan.textContent = flagText;
+
+          li.appendChild(iconSvg);
+          li.appendChild(textSpan);
+          resFlags.appendChild(li);
+        });
+      }
+
+      // Steps list
+      resSteps.innerHTML = "";
+      const steps = Array.isArray(data.what_to_do) ? data.what_to_do : [];
+      if (steps.length === 0) {
+        stepsPanel.style.display = "none";
+      } else {
+        stepsPanel.style.display = "block";
+        steps.forEach((stepText, idx) => {
+          const li = document.createElement("li");
+          li.className = "step-item";
+
+          const badge = document.createElement("span");
+          badge.className = "step-badge-num";
+          badge.textContent = String(idx + 1);
+
+          const textSpan = document.createElement("span");
+          textSpan.className = "step-text";
+          textSpan.textContent = stepText;
+
+          li.appendChild(badge);
+          li.appendChild(textSpan);
+          resSteps.appendChild(li);
+        });
+      }
+
+      resultsSection.classList.add('visible');
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      announceAria(`Analysis complete. Risk assessment: ${riskTitle}. ${data.headline || ''}`);
+    }
+
+    /* ==========================================================================
+       Browser Text-to-Speech (Web Speech API)
+       ========================================================================== */
+    function setSpeechButtonLabel(isPlaying) {
+      btnListen.setAttribute("aria-pressed", String(isPlaying));
+      listenLabel.textContent = isPlaying ? t("stopListenBtn") : t("listenBtn");
+    }
+
+    function stopSpeech() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setSpeechButtonLabel(false);
+      state.speechUtterance = null;
+    }
+
+    function pickVoice(targetLangCode) {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      const norm = (code) => (code || '').replace('_', '-').toLowerCase();
+      const exact = voices.find(v => norm(v.lang) === targetLangCode.toLowerCase());
+      if (exact) return exact;
+
+      const prefix = targetLangCode.slice(0, 2).toLowerCase();
+      const fallback = voices.find(v => norm(v.lang).startsWith(prefix));
+      return fallback || null;
+    }
+
+    function toggleSpeechPlayback() {
+      if (!("speechSynthesis" in window)) {
+        showToast('warning', 'TTS Unavailable', t('errSpeechUnsupported'));
+        return;
+      }
+
+      if (window.speechSynthesis.speaking) {
+        stopSpeech();
+        return;
+      }
+
+      if (!state.lastAnalyzedData) return;
+
+      const data = state.lastAnalyzedData;
+      const speechParts = [
+        resRiskTitle.textContent,
+        data.headline,
+        data.summary,
+        ...(Array.isArray(data.what_to_do) ? data.what_to_do : [])
+      ].filter(Boolean);
+
+      const speechText = speechParts.join(". ");
+      if (!speechText) return;
+
+      const utterance = new SpeechSynthesisUtterance(speechText);
+      const targetCode = VOICE_LANG[state.lang] || "en-IN";
+      utterance.lang = targetCode;
+      utterance.rate = 0.9;
+
+      const voice = pickVoice(targetCode);
+      if (voice) utterance.voice = voice;
+
+      utterance.onend = () => setSpeechButtonLabel(false);
+      utterance.onerror = () => setSpeechButtonLabel(false);
+
+      state.speechUtterance = utterance;
+      setSpeechButtonLabel(true);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    btnListen.addEventListener('click', toggleSpeechPlayback);
+    btnReset.addEventListener('click', () => {
+      clearFileSelection();
+      $("upload-card-title").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Populate voices when loaded by browser
+    if ("speechSynthesis" in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = () => {};
+    }
+
+    // Restore saved language preference
+    try {
+      const savedLang = localStorage.getItem("plainsight_lang_pref");
+      if (savedLang && I18N[savedLang]) {
+        applyLanguage(savedLang);
+      }
+    } catch (e) {}
+
+    // Initial render
+    applyLanguage(state.lang);
+  </script>
 </body>
 </html>

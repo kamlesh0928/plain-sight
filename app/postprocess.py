@@ -1,3 +1,4 @@
+import json
 import re
 
 RISK_LEVELS = ("safe", "careful", "likely_scam")
