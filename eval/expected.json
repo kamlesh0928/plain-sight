@@ -1,0 +1,85 @@
+[
+    {
+        "file": "kyc_sms_scam.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "upi_collect_trap.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "lottery_scam.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "fake_loan_scam.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "fake_support_scam.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "power_cut_scam.png",
+        "accept": [
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "wrong_transfer_scam.png",
+        "accept": [
+            "careful",
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "insurance_link_unknown.png",
+        "accept": [
+            "careful",
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "cashback_offer.png",
+        "accept": [
+            "careful",
+            "likely_scam"
+        ]
+    },
+    {
+        "file": "bank_debit_alert.png",
+        "accept": [
+            "safe"
+        ]
+    },
+    {
+        "file": "recharge_ok.png",
+        "accept": [
+            "safe"
+        ]
+    },
+    {
+        "file": "electricity_bill.png",
+        "accept": [
+            "safe",
+            "careful"
+        ]
+    },
+    {
+        "file": "delivery_otp.png",
+        "accept": [
+            "safe",
+            "careful"
+        ]
+    }
+]

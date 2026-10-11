@@ -1,9 +1,533 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body></body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PlainSight</title>
+<meta name="description" content="Understand anything on your screen, in your language.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #15222E;
+    --muted: #51606E;
+    --ground: #EAF0F3;
+    --surface: #FFFFFF;
+    --line: #C9D5DC;
+    --action: #1D5D9B;
+    --safe: #1F7A4F;
+    --careful: #8A5A00;
+    --scam: #B3261E;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 17px/1.55 "Noto Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap {
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: max(1rem, env(safe-area-inset-top)) 1rem max(2rem, env(safe-area-inset-bottom));
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .5rem 0 1rem;
+  }
+  .brand { font-weight: 700; font-size: 1.3rem; letter-spacing: -.01em; }
+  .seg {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  .seg button {
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: .95rem;
+    min-height: 40px;
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  button:focus-visible, .btn:focus-visible { outline: 3px solid var(--action); outline-offset: 2px; }
+
+  h1 {
+    font-size: 1.7rem;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    margin: .25rem 0 1.25rem;
+  }
+
+  .picker {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 9rem;
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--muted);
+  }
+  .stage img { max-width: 100%; max-height: 16rem; object-fit: contain; border-radius: 6px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: .5rem .75rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+  }
+  .go {
+    width: 100%;
+    margin-top: .75rem;
+    min-height: 60px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--action);
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+  .go:disabled { background: #9DB3C6; cursor: not-allowed; }
+  .privacy { margin: .75rem 0 0; font-size: .9rem; color: var(--muted); text-align: center; }
+
+  .status { margin: 1rem 0 0; min-height: 1.5rem; color: var(--muted); }
+  .status.error { color: var(--scam); font-weight: 500; }
+  .spinner {
+    display: inline-block;
+    width: 1em; height: 1em;
+    margin-right: .5em;
+    vertical-align: -.15em;
+    border: 2px solid var(--line);
+    border-top-color: var(--action);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--line); } }
+
+  .verdict {
+    margin-top: 1.25rem;
+    padding: 1.1rem 1.1rem 1.15rem;
+    border-radius: 16px 16px 4px 4px;
+    color: #fff;
+    background: var(--careful);
+  }
+  .verdict[data-risk="safe"] { background: var(--safe); }
+  .verdict[data-risk="careful"] { background: var(--careful); }
+  .verdict[data-risk="likely_scam"] { background: var(--scam); }
+  .verdict .label {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .verdict svg { flex: none; width: 2rem; height: 2rem; }
+  .verdict .headline { margin: .5rem 0 0; font-size: 1.05rem; }
+  .listen {
+    margin-top: .9rem;
+    min-height: 48px;
+    padding: .4rem 1.1rem;
+    border: 1.5px solid #fff;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .listen[aria-pressed="true"] { background: #fff; color: var(--ink); }
+  .listen:focus-visible { outline-color: #fff; }
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 4px 4px 12px 12px;
+    padding: 1.1rem;
+  }
+  .doctype { margin: 0 0 .25rem; color: var(--muted); font-size: .95rem; }
+  .detail p { margin: 0 0 1rem; }
+  .detail h2 { font-size: 1.1rem; margin: 1.25rem 0 .5rem; }
+  .detail ul, .detail ol { margin: 0; padding: 0; list-style: none; }
+  .detail li { position: relative; padding: .45rem 0 .45rem 1.1rem; }
+  .detail ul li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: .5rem; bottom: .5rem;
+    width: 4px;
+    border-radius: 2px;
+    background: var(--scam);
+  }
+  .detail ol { counter-reset: step; }
+  .detail ol li { padding-left: 2.1rem; counter-increment: step; }
+  .detail ol li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: .45rem;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-align: center;
+  }
+  .notice {
+    margin: 1rem 0 0;
+    padding: .75rem .9rem;
+    border-left: 4px solid var(--careful);
+    background: #FFF6DD;
+    border-radius: 4px;
+    font-size: .95rem;
+  }
+  footer { margin-top: 1.75rem; font-size: .9rem; color: var(--muted); text-align: center; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand">PlainSight</span>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">English</button>
+      <button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिन्दी</button>
+      <button type="button" data-lang="mr" aria-pressed="false" lang="mr">मराठी</button>
+    </div>
+  </header>
+
+  <main>
+    <h1 data-i="tagline">Understand anything on your screen, in your language.</h1>
+
+    <section class="picker" aria-label="Choose an image">
+      <div class="stage" id="stage">
+        <span id="empty" data-i="hint">Add a screenshot or photo of an SMS, bill, payment request or message.</span>
+        <img id="preview" alt="" hidden>
+      </div>
+      <div class="row">
+        <button type="button" class="btn" id="btnCam" data-i="camera">Take a photo</button>
+        <button type="button" class="btn" id="btnGal" data-i="gallery">Choose from gallery</button>
+      </div>
+      <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
+      <input type="file" id="inGal" accept="image/*" hidden>
+      <button type="button" class="go" id="go" disabled data-i="explain">Explain this</button>
+      <p class="privacy" data-i="privacy">Your image is not saved.</p>
+    </section>
+
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+
+    <section id="result" hidden aria-live="polite">
+      <div class="verdict" id="verdict" data-risk="careful">
+        <div class="label"><span id="icon" aria-hidden="true"></span><span id="riskLabel"></span></div>
+        <p class="headline" id="headline"></p>
+        <button type="button" class="listen" id="listen" aria-pressed="false" data-i="listen">Listen</button>
+      </div>
+      <div class="detail">
+        <p class="doctype" id="docType"></p>
+        <p id="summary"></p>
+        <div id="flagsBox">
+          <h2 data-i="flags">What looks wrong</h2>
+          <ul id="flags"></ul>
+        </div>
+        <div id="stepsBox">
+          <h2 data-i="steps">What to do</h2>
+          <ol id="steps"></ol>
+        </div>
+        <p class="notice" id="lowConf" hidden></p>
+        <p class="notice" id="demoNote" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <footer data-i="disclaimer">PlainSight is a helper, not a bank. Never share your OTP or PIN.</footer>
+</div>
+
+<script>
+"use strict";
+
+const I18N = {
+  en: {
+    tagline: "Understand anything on your screen, in your language.",
+    hint: "Add a screenshot or photo of an SMS, bill, payment request or message.",
+    camera: "Take a photo",
+    gallery: "Choose from gallery",
+    explain: "Explain this",
+    privacy: "Your image is not saved.",
+    listen: "Listen",
+    stop: "Stop",
+    flags: "What looks wrong",
+    steps: "What to do",
+    reading: "Reading your image…",
+    error: "Something went wrong. Please try again.",
+    noImage: "Add a photo first.",
+    lowConf: "I am not fully sure. Ask someone you trust before you act.",
+    demoNote: "This is a sample result because the model was not available.",
+    noVoice: "No voice for this language is installed on this device.",
+    disclaimer: "PlainSight is a helper, not a bank. Never share your OTP or PIN.",
+    safe: "Looks safe",
+    careful: "Be careful",
+    likely_scam: "Likely a scam"
+  },
+  hi: {
+    tagline: "आपकी स्क्रीन पर जो भी हो, अपनी भाषा में समझें।",
+    hint: "SMS, बिल, पेमेंट रिक्वेस्ट या मैसेज का स्क्रीनशॉट या फोटो जोड़ें।",
+    camera: "फोटो लें",
+    gallery: "गैलरी से चुनें",
+    explain: "यह समझाएँ",
+    privacy: "आपकी इमेज सेव नहीं होती।",
+    listen: "सुनें",
+    stop: "रोकें",
+    flags: "क्या गड़बड़ लग रहा है",
+    steps: "क्या करें",
+    reading: "आपकी इमेज पढ़ी जा रही है…",
+    error: "कुछ गड़बड़ हो गई। फिर से कोशिश करें।",
+    noImage: "पहले एक फोटो जोड़ें।",
+    lowConf: "मुझे पूरा यक़ीन नहीं है। कुछ करने से पहले किसी भरोसेमंद व्यक्ति से पूछें।",
+    demoNote: "मॉडल उपलब्ध नहीं था, इसलिए यह एक नमूना परिणाम है।",
+    noVoice: "इस डिवाइस पर इस भाषा की आवाज़ उपलब्ध नहीं है।",
+    disclaimer: "PlainSight सहायक है, बैंक नहीं। OTP या PIN कभी साझा न करें।",
+    safe: "सुरक्षित लगता है",
+    careful: "सावधान रहें",
+    likely_scam: "धोखाधड़ी की आशंका"
+  },
+  mr: {
+    tagline: "तुमच्या स्क्रीनवरील काहीही, तुमच्या भाषेत समजून घ्या.",
+    hint: "SMS, बिल, पेमेंट रिक्वेस्ट किंवा मेसेजचा स्क्रीनशॉट किंवा फोटो जोडा.",
+    camera: "फोटो काढा",
+    gallery: "गॅलरीतून निवडा",
+    explain: "हे समजावा",
+    privacy: "तुमची इमेज साठवली जात नाही.",
+    listen: "ऐका",
+    stop: "थांबवा",
+    flags: "काय चुकीचे वाटते",
+    steps: "काय करावे",
+    reading: "तुमची इमेज वाचत आहे…",
+    error: "काहीतरी चुकले. पुन्हा प्रयत्न करा.",
+    noImage: "आधी एक फोटो जोडा.",
+    lowConf: "मला पूर्ण खात्री नाही. काही करण्याआधी विश्वासू व्यक्तीला विचारा.",
+    demoNote: "मॉडेल उपलब्ध नव्हते, म्हणून हा एक नमुना निकाल आहे.",
+    noVoice: "या डिव्हाइसवर या भाषेचा आवाज उपलब्ध नाही.",
+    disclaimer: "PlainSight हा सहाय्यक आहे, बँक नाही. OTP किंवा PIN कधीही शेअर करू नका.",
+    safe: "सुरक्षित वाटते",
+    careful: "सावध रहा",
+    likely_scam: "फसवणुकीची शक्यता"
+  }
+};
+
+const VOICE_LANG = { en: "en-IN", hi: "hi-IN", mr: "mr-IN" };
+
+const ICONS = {
+  safe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>',
+  careful: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>',
+  likely_scam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>'
+};
+
+const state = { lang: "en", file: null, url: null, busy: false, hasResult: false, speech: "" };
+const $ = (id) => document.getElementById(id);
+const t = (key) => I18N[state.lang][key];
+
+function applyLang() {
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll("[data-i]").forEach((el) => { el.textContent = t(el.dataset.i); });
+  document.querySelectorAll(".seg button").forEach((b) => {
+    b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang));
+  });
+  setListenLabel(false);
+}
+
+function setStatus(message, { error = false, spinner = false } = {}) {
+  const el = $("status");
+  el.className = "status" + (error ? " error" : "");
+  el.textContent = "";
+  if (spinner) {
+    const s = document.createElement("span");
+    s.className = "spinner";
+    s.setAttribute("aria-hidden", "true");
+    el.appendChild(s);
+  }
+  el.appendChild(document.createTextNode(message || ""));
+}
+
+function setFile(file) {
+  if (!file) return;
+  state.file = file;
+  if (state.url) URL.revokeObjectURL(state.url);
+  state.url = URL.createObjectURL(file);
+  $("preview").src = state.url;
+  $("preview").hidden = false;
+  $("empty").hidden = true;
+  $("go").disabled = false;
+  $("result").hidden = true;
+  state.hasResult = false;
+  stopSpeaking();
+  setStatus("");
+}
+
+function fillList(id, items) {
+  const list = $(id);
+  list.textContent = "";
+  items.forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    list.appendChild(li);
+  });
+}
+
+function render(data) {
+  const risk = ["safe", "careful", "likely_scam"].includes(data.risk_level) ? data.risk_level : "careful";
+  $("verdict").dataset.risk = risk;
+  $("icon").innerHTML = ICONS[risk];
+  $("riskLabel").textContent = t(risk);
+  $("headline").textContent = data.headline || "";
+  $("headline").hidden = !data.headline;
+  $("docType").textContent = data.doc_type || "";
+  $("summary").textContent = data.summary || "";
+
+  const flags = data.red_flags || [];
+  const steps = data.what_to_do || [];
+  fillList("flags", flags);
+  fillList("steps", steps);
+  $("flagsBox").hidden = flags.length === 0;
+  $("stepsBox").hidden = steps.length === 0;
+
+  $("lowConf").textContent = t("lowConf");
+  $("lowConf").hidden = data.confidence !== "low";
+  $("demoNote").textContent = t("demoNote");
+  $("demoNote").hidden = !data.demo;
+
+  state.speech = [t(risk), data.headline, data.summary, ...steps].filter(Boolean).join(". ");
+  state.hasResult = true;
+  $("result").hidden = false;
+  $("verdict").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+async function analyze() {
+  if (!state.file) { setStatus(t("noImage"), { error: true }); return; }
+  if (state.busy) return;
+  state.busy = true;
+  $("go").disabled = true;
+  stopSpeaking();
+  setStatus(t("reading"), { spinner: true });
+
+  const body = new FormData();
+  body.append("image", state.file, state.file.name || "image.jpg");
+  body.append("lang", state.lang);
+
+  try {
+    const res = await fetch("/analyze", { method: "POST", body });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    render(await res.json());
+    setStatus("");
+  } catch (err) {
+    $("result").hidden = true;
+    setStatus(t("error"), { error: true });
+  } finally {
+    state.busy = false;
+    $("go").disabled = false;
+  }
+}
+
+/* ---------- read aloud (Web Speech API) ---------- */
+function setListenLabel(speaking) {
+  const btn = $("listen");
+  btn.textContent = speaking ? t("stop") : t("listen");
+  btn.setAttribute("aria-pressed", String(speaking));
+}
+
+function stopSpeaking() {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  setListenLabel(false);
+}
+
+function pickVoice(target) {
+  const voices = window.speechSynthesis.getVoices();
+  const norm = (v) => v.lang.replace("_", "-").toLowerCase();
+  const exact = voices.find((v) => norm(v) === target.toLowerCase());
+  const loose = voices.find((v) => norm(v).startsWith(target.slice(0, 2).toLowerCase()));
+  return { voice: exact || loose || null, haveVoices: voices.length > 0 };
+}
+
+function toggleSpeech() {
+  if (!("speechSynthesis" in window)) { setStatus(t("noVoice"), { error: true }); return; }
+  if (window.speechSynthesis.speaking) { stopSpeaking(); return; }
+  if (!state.speech) return;
+
+  const utter = new SpeechSynthesisUtterance(state.speech);
+  utter.lang = VOICE_LANG[state.lang];
+  utter.rate = 0.9;
+  const { voice, haveVoices } = pickVoice(utter.lang);
+  if (voice) utter.voice = voice;
+  else if (haveVoices && state.lang !== "en") setStatus(t("noVoice"), { error: true });
+  utter.onend = utter.onerror = () => setListenLabel(false);
+  setListenLabel(true);
+  window.speechSynthesis.speak(utter);
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll(".seg button").forEach((b) => {
+  b.addEventListener("click", () => {
+    if (b.dataset.lang === state.lang) return;
+    state.lang = b.dataset.lang;
+    try { localStorage.setItem("plainsight-lang", state.lang); } catch (e) { /* storage may be blocked */ }
+    stopSpeaking();
+    applyLang();
+    setStatus("");
+    if (state.file && state.hasResult) analyze();  // explain again in the new language
+  });
+});
+
+$("btnCam").addEventListener("click", () => $("inCam").click());
+$("btnGal").addEventListener("click", () => $("inGal").click());
+$("inCam").addEventListener("change", (e) => setFile(e.target.files[0]));
+$("inGal").addEventListener("change", (e) => setFile(e.target.files[0]));
+$("go").addEventListener("click", analyze);
+$("listen").addEventListener("click", toggleSpeech);
+
+try {
+  const saved = localStorage.getItem("plainsight-lang");
+  if (saved && I18N[saved]) state.lang = saved;
+} catch (e) { /* ignore */ }
+applyLang();
+</script>
+</body>
 </html>
