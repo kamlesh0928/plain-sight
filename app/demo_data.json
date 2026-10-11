@@ -1,0 +1,56 @@
+{
+    "en": {
+        "doc_type": "SMS message",
+        "headline": "Do not click the link. This looks like a scam.",
+        "summary": "This message says your account will be blocked unless you update your KYC through a link. Real banks do not ask you to do this by SMS. It is trying to scare you into acting fast.",
+        "risk_level": "likely_scam",
+        "red_flags": [
+            "It threatens to block your account today.",
+            "It asks you to open a link from an unknown sender.",
+            "It asks you to call a personal mobile number."
+        ],
+        "what_to_do": [
+            "Do not click the link or call the number.",
+            "Contact your bank using the number on your card or its official app.",
+            "Report it at cybercrime.gov.in or call 1930."
+        ],
+        "confidence": "high",
+        "adjusted": false
+    },
+    "hi": {
+        "doc_type": "एसएमएस संदेश",
+        "headline": "लिंक पर क्लिक न करें। यह धोखाधड़ी लगती है।",
+        "summary": "इस संदेश में कहा गया है कि लिंक से KYC अपडेट नहीं किया तो आपका खाता बंद हो जाएगा। असली बैंक SMS से ऐसा नहीं कहते। यह संदेश आपको डराकर जल्दी में कदम उठवाना चाहता है।",
+        "risk_level": "likely_scam",
+        "red_flags": [
+            "आज ही खाता बंद करने की धमकी दी गई है।",
+            "अनजान भेजने वाले के लिंक को खोलने को कहा गया है।",
+            "किसी निजी मोबाइल नंबर पर कॉल करने को कहा गया है।"
+        ],
+        "what_to_do": [
+            "लिंक पर क्लिक न करें और उस नंबर पर कॉल न करें।",
+            "अपने कार्ड के पीछे लिखे नंबर या बैंक के असली ऐप से बैंक से बात करें।",
+            "cybercrime.gov.in पर शिकायत करें या 1930 पर कॉल करें।"
+        ],
+        "confidence": "high",
+        "adjusted": false
+    },
+    "mr": {
+        "doc_type": "एसएमएस संदेश",
+        "headline": "लिंकवर क्लिक करू नका. ही फसवणूक वाटते.",
+        "summary": "या संदेशात म्हटले आहे की लिंकवरून KYC अपडेट केले नाही तर तुमचे खाते बंद होईल. खरे बँक असे SMS ने सांगत नाहीत. हा संदेश तुम्हाला घाबरवून घाईत कृती करायला लावत आहे.",
+        "risk_level": "likely_scam",
+        "red_flags": [
+            "आजच खाते बंद करण्याची धमकी दिली आहे.",
+            "अनोळखी प्रेषकाची लिंक उघडायला सांगितले आहे.",
+            "वैयक्तिक मोबाइल नंबरवर कॉल करायला सांगितले आहे."
+        ],
+        "what_to_do": [
+            "लिंकवर क्लिक करू नका आणि त्या नंबरवर कॉल करू नका.",
+            "तुमच्या कार्डमागील नंबरवर किंवा बँकेच्या खऱ्या ॲपमधून बँकेशी संपर्क साधा.",
+            "cybercrime.gov.in वर तक्रार करा किंवा 1930 वर कॉल करा."
+        ],
+        "confidence": "high",
+        "adjusted": false
+    }
+}
